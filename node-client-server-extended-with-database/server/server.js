@@ -6,7 +6,7 @@ const express = require('express');
 const mysql = require('mysql');
 // Database connection info - used from environment variables
 var dbInfo = {
-    connectionLimit : 10,
+    connectionLimit: 10,
     host: process.env.MYSQL_HOSTNAME,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
