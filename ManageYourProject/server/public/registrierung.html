@@ -29,10 +29,10 @@
                 Registrierung
             </div>
             <div class="card-body">
-                <form action="/" method="POST"> <!-- define where the form is send to-->>
+                <form action="/registrierung/" method="POST"> <!-- define where the form is send to-->
                     <div class="form-group">
-                      <label for="name">Name</label>
-                      <input type="text" class="form-control" id="name" name="name">
+                      <label for="nname">Name</label>
+                      <input type="text" class="form-control" id="nname" name="nname">
                     </div>
                     <div class="form-group">
                         <label for="vname">Vorname</label>
@@ -50,11 +50,17 @@
                         <label for="passwortWiederholen">Passwort Wiederholen</label>
                         <input type="password" class="form-control" id="passwortWiederholen" name = "passwortWiederholen"> 
                       </div>
+
+
                     
                     <button type="submit" class="btn btn-primary">Benutzer registrieren</button>
                   </form>
             </div>
           </div>
+          
+          {{#if message}}
+            <h4 class = "alert alert-danger mt-4">{{message}}</h4>
+          {{/if}}
     </div>
 </body>
 </html>

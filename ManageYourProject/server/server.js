@@ -112,6 +112,72 @@ app.get("/button2", (req, res) => {
 });
 // ###################### BUTTON EXAMPLE END ######################
 
+// registration
+app.post("/registrierung/", (req, res) => {
+	// it will be added to the database with a query.
+	if (!req.body && !req.body.nname && !req.body.vname && !req.body.email && !req.body.passwort && !req.body.passwortWiederholen) {
+		// There is nobody with correct data
+		console.error("Client send no correct data!");
+		// Set HTTP Status -> 400 is client error -> and send message
+		res.status(400).json({
+			message: "This function requries a body with all fields filled out",
+		});
+	}
+	// The content looks good, so move on
+	// Get the content to local variables:
+	var nname = req.body.nname;
+	var vname = req.body.vname;
+	var email = req.body.email;
+	var passwort = req.body.passwort;
+	var passwortWiederholen = req.body.passwortWiederholen;
+
+	//verifying if email already exists
+    connection.query("SELECT email FROM user WHERE email = ?", [email], (error, result)=> {
+        if(error){
+            console.log(error);
+        }
+        if(results.length > 0){
+            return res.render("registrierung", {
+                message : "Diese E-mail wird bereits verwendet"
+            })
+			//verifying password format
+        }else if(passwort.length < 8){
+            return res.render("registrierung", {
+                message: "Ihr Passwort muss mindestens 8 Zeichen beinhalten"
+            })
+        }else if(passwort !== passwortWiederholen){
+            return res.render("registrierung", {
+				//TODO Rückmeldung wie bei button1 oder 2
+                message: "Passwörter stimmen nicht überein."
+            });
+        }else{
+			const hashedPasswort = passwort; //await bcrypt.hash(passwort,8)
+		}
+    })
+	
+	connection.query(
+		"INSERT INTO event (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
+			nname +
+			"', '" +
+			vname +
+			"', '" +
+			email +
+			"', '" +
+			hashedPasswort +
+			")",
+		(error, result) => {
+			if (error) {
+				// we got an errror - inform the client
+				console.error(error); // <- log error in server
+				res.status(500).json(error); // <- send to client
+			}
+			console.log("Der Benutzer mit der: " + result.userid + " wurde erfolgreich von user erstellt.");
+			//TODO Rückmeldung an benutzer
+		}
+	);
+});
+
+
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
 	// it will be added to the database with a query.
