@@ -131,30 +131,57 @@ app.post("/registrierung", (req, res) => {
 	var email = req.body.email;
 	var passwort = req.body.passwort;
 	var passwortWiederholen = req.body.passwortWiederholen;
-	connection.query(
-		//TODO passwort in query hinzufügen
-		"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
-			nname +
-			"', '" +
-			vname +
-			"', '" +
-			email +
-			"', '" +
-			passwort +
-			"')",
-		(error, result) => {
-			if (error) {
-				// we got an errror - inform the client
-				console.error(error); // <- log error in server
-				res.status(500).json(error); // <- send to client
-			}
-			console.log("Das anlegen des Nutzers "+ vname + " " + nname + " wurde erfolgreich angelegt.");
+
+	
+	//TODO check if email already exists
+	connection.query("SELECT * FROM user WHERE email = '" + email + "'",(error, result) => {
+		if (error) {
+			// we got an errror - inform the client
+			console.error(error); // <- log error in server
+			res.status(500).json(error); // <- send to client
 		}
-	);
-	connection.query(
-		"INSERT INTO login (pass"
-	)
-});
+		if(result.length > 0){
+			console.log("Es gibt bereits einen Nutzer mit der Email Adresse: " + email);
+			// Send it to the client / webbrowser:
+			var message = "Die Email Adresse ist bereits vergeben."
+			res.send("Antwort: " + message);
+		}else if(passwort.length < 8){
+			console.log("Das eingegebenen passswort ist nur " + passwort.length + " Zeichen lang");
+			// Send it to the client / webbrowser:
+			var message = "Das Passwort muss mindestens 8 Zeichen lang sein."
+			res.send("Antwort: " + message);
+		}else if(passwort !== passwortWiederholen){
+			console.log("Die eingegebenen Passwörter " + passwort + " und " + passwortWiederholen + " stimmen nicht überein.");
+			// Send it to the client / webbrowser:
+			var message = "Die Passwörter stimmen nicht überein."
+			res.send("Antwort: " + message);
+		}//else if()
+		//TODO Passwort hashen
+		else{
+			connection.query(
+				//TODO passwort in query hinzufügen
+				"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
+					nname +
+					"', '" +
+					vname +
+					"', '" +
+					email +
+					"', '" +
+					passwort +
+					"')",
+				(error, result) => {
+					if (error) {
+						// we got an errror - inform the client
+						console.error(error); // <- log error in server
+						res.status(500).json(error); // <- send to client
+					}
+					console.log("Das anlegen des Nutzers "+ vname + " " + nname + " wurde erfolgreich angelegt.");
+				}
+			);
+		}
+	});
+	})
+	
 // app.post("/registrierung/", (req, res) => {
 // 	// it will be added to the database with a query.
 // 	if (!req.body && !req.body.nname && !req.body.vname && !req.body.email && !req.body.passwort && !req.body.passwortWiederholen) {
