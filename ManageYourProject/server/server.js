@@ -133,31 +133,33 @@ app.post("/registrierung", (req, res) => {
 	var passwortWiederholen = req.body.passwortWiederholen;
 
 	
-	//TODO check if email already exists
+	
 	connection.query("SELECT * FROM user WHERE email = '" + email + "'",(error, result) => {
 		if (error) {
 			// we got an errror - inform the client
 			console.error(error); // <- log error in server
 			res.status(500).json(error); // <- send to client
 		}
-		if(result.length > 0){
+		
+		if(result.length > 0){ //check if email already exists
 			console.log("Es gibt bereits einen Nutzer mit der Email Adresse: " + email);
 			// Send it to the client / webbrowser:
 			var message = "Die Email Adresse ist bereits vergeben."
 			res.send("Antwort: " + message);
-		}else if(passwort.length < 8){
+		}
+		else if(passwort.length < 8){ //check if password has the right length
 			console.log("Das eingegebenen passswort ist nur " + passwort.length + " Zeichen lang");
 			// Send it to the client / webbrowser:
 			var message = "Das Passwort muss mindestens 8 Zeichen lang sein."
 			res.send("Antwort: " + message);
-		}else if(passwort !== passwortWiederholen){
+		}else if(passwort !== passwortWiederholen){ //check if password matches with the repeated password
 			console.log("Die eingegebenen Passwörter " + passwort + " und " + passwortWiederholen + " stimmen nicht überein.");
 			// Send it to the client / webbrowser:
 			var message = "Die Passwörter stimmen nicht überein."
 			res.send("Antwort: " + message);
-		}//else if()
-		//TODO Passwort hashen
+		}
 		else{
+			//TODO Passwort hashen
 			connection.query(
 				//TODO passwort in query hinzufügen
 				"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
