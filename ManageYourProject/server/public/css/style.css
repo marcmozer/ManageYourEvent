@@ -33,3 +33,28 @@ nav li a.abmelden:hover{
     color: red;
     text-decoration: none;
 }
+menu { 
+    background-color: rgb(84, 87, 87);
+    color: #fff;
+    padding: 10px 60px;
+    display: flex;
+    justify-content: space-between;
+}
+menu ul{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;   
+}
+menu li{
+    list-style: none;
+}
+menu li a{
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 8px;
+}
+menu li a:hover{
+    color: greenyellow;
+    text-decoration: none;
+}
