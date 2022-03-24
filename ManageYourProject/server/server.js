@@ -63,30 +63,30 @@ app.get("/", (req, res) => {
 });
 
 // Another GET Path - call it with: http://localhost:8080/special_path
-app.get("/special_path", (req, res) => {
-	res.send("This is another path");
-});
+// app.get("/special_path", (req, res) => {
+// 	res.send("This is another path");
+// });
 
 // Another GET Path that shows the actual Request (req) Headers - call it with: http://localhost:8080/request_info
-app.get("/request_info", (req, res) => {
-	console.log("Request content:", req);
-	res.send("This is all I got from the request:" + JSON.stringify(req.headers));
-});
+// app.get("/request_info", (req, res) => {
+// 	console.log("Request content:", req);
+// 	res.send("This is all I got from the request:" + JSON.stringify(req.headers));
+// });
 
 // POST Path - call it with: POST http://localhost:8080/client_post
-app.post("/client_post", (req, res) => {
-	if (!!req.body && !!req.body.post_content) {
-		var post_content = req.body.post_content;
-		console.log("Client send 'post_content' with content:", post_content);
-		// Set HTTP Status -> 200 is okay -> and send message
-		res.status(200).json({ message: "I got your message: " + post_content });
-	} else {
-		// There is no body and post_contend
-		console.error("Client send no 'post_content'");
-		// Set HTTP Status -> 400 is client error -> and send message
-		res.status(400).json({ message: 'This function requries a body with "post_content"' });
-	}
-});
+// app.post("/client_post", (req, res) => {
+// 	if (!!req.body && !!req.body.post_content) {
+// 		var post_content = req.body.post_content;
+// 		console.log("Client send 'post_content' with content:", post_content);
+// 		// Set HTTP Status -> 200 is okay -> and send message
+// 		res.status(200).json({ message: "I got your message: " + post_content });
+// 	} else {
+// 		// There is no body and post_contend
+// 		console.error("Client send no 'post_content'");
+// 		// Set HTTP Status -> 400 is client error -> and send message
+// 		res.status(400).json({ message: 'This function requries a body with "post_content"' });
+// 	}
+// });
 
 // ###################### BUTTON EXAMPLE ######################
 // POST path for Button 1
@@ -116,7 +116,7 @@ app.get("/button2", (req, res) => {
 // registration
 app.post("/registrierung", (req, res) => {
 	// it will be added to the database with a query.
-	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl && !req.body.userid) {
+	if (!req.body && !req.body.vname && !req.body.nname && !req.body.email && !req.body.passwort && !req.body.passwortWiederholen) {
 		// There is nobody with correct data
 		console.error("Client send no correct data!");
 		// Set HTTP Status -> 400 is client error -> and send message
@@ -133,7 +133,7 @@ app.post("/registrierung", (req, res) => {
 	var passwortWiederholen = req.body.passwortWiederholen;
 
 	
-	
+	//TODO Antworten an Client senden
 	connection.query("SELECT * FROM user WHERE email = '" + email + "'",(error, result) => {
 		if (error) {
 			// we got an errror - inform the client
@@ -160,6 +160,12 @@ app.post("/registrierung", (req, res) => {
 		}
 		else{
 			//TODO Passwort hashen
+			// bcrypt.hash(passwort, 10, (err, hash) => {
+			// 	if (err) {
+			// 	  throw err;
+			// 	}
+			// 	console.log('Your hash: ', hash);
+			//   });
 			connection.query(
 				//TODO passwort in query hinzufügen
 				"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
@@ -182,11 +188,12 @@ app.post("/registrierung", (req, res) => {
 			);
 		}
 	});
-	})
-	
-// app.post("/registrierung/", (req, res) => {
+});
+//login
+
+// app.post("/login", (req, res) => {
 // 	// it will be added to the database with a query.
-// 	if (!req.body && !req.body.nname && !req.body.vname && !req.body.email && !req.body.passwort && !req.body.passwortWiederholen) {
+// 	if (!req.body && !req.body.email && !req.body.passwort) {
 // 		// There is nobody with correct data
 // 		console.error("Client send no correct data!");
 // 		// Set HTTP Status -> 400 is client error -> and send message
@@ -196,55 +203,51 @@ app.post("/registrierung", (req, res) => {
 // 	}
 // 	// The content looks good, so move on
 // 	// Get the content to local variables:
-// 	var nname = req.body.nname;
-// 	var vname = req.body.vname;
 // 	var email = req.body.email;
-// 	var passwort = req.body.passwort;
-// 	var passwortWiederholen = req.body.passwortWiederholen;
+// 	var eingegebenesPasswort = req.body.passwort;
 
-// 	//verifying if email already exists
-//     connection.query("SELECT email FROM user WHERE email = " + email) 
-// 	console.log("Das ist die eingegebene Email "+ email);
-//         if(error){
-//             console.log(error);
-//         }
-//         if(results.length > 0){
-//             return res.render("registrierung", {
-//                 message : "Diese E-mail wird bereits verwendet"
-//             })
-// 			//verifying password format
-//         }else if(passwort.length < 8){
-//             return res.render("registrierung", {
-//                 message: "Ihr Passwort muss mindestens 8 Zeichen beinhalten"
-//             })
-//         }else if(passwort !== passwortWiederholen){
-//             return res.render("registrierung", {
-// 				//TODO Rückmeldung wie bei button1 oder 2
-//                 message: "Passwörter stimmen nicht überein."
-//             });
-//         }
-//     })
-	
-// 	connection.query(
-// 		"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
-// 			nname +
-// 			"', '" +
-// 			vname +
-// 			"', '" +
-// 			email +
-// 			"', '" +
-// 			passwort +
-// 			")",
-// 		(error, result) => {
+// 	console.log(email + " " + eingegebenesPasswort);
+// 		res.send(email + " + " + eingegebenesPasswort);
+	// var hashedPasswort = 
+// 	connection.query("SELECT * FROM user WHERE email ='" + email + "'", 
+// 	(error, result) => {
+// 		if (error) {
+// 			// we got an errror - inform the client
+// 			console.error(error); // <- log error in server
+// 			res.status(500).json(error); // <- send to client
+// 		}console.log(email)
+// 		if(result < 1){
+// 			console.log("Kein Account mit der eingegbenen Email Adresse vorhanden");
+// 			// Send it to the client / webbrowser:
+// 			var message = "Es existiert kein Account mit der Email Adresse " + email
+// 			res.send("Antwort: " + message);
+// 		}else{
+// 			var hinterlegtesPasswort = connection.query("SELECT passwort FROM user WHERE email = '"+ email + "'" ,
+// 			(error, result) => {
+// 				console.log("Hinterlegtes Passwort = "+hinterlegtesPasswort);
 // 			if (error) {
 // 				// we got an errror - inform the client
 // 				console.error(error); // <- log error in server
 // 				res.status(500).json(error); // <- send to client
+// 			}else if(hinterlegtesPasswort != eingegebenesPasswort){
+// 					console.log("Falsches Passwort eingegeben");
+// 					// Send it to the client / webbrowser:
+// 					var message = "Es wurde ein falsches Passwort eingegeben-"
+// 					res.send("Antwort: " + message);
+// 			}else{
+// 				res.redirect("/uebersicht.html");
+// 				console.log("Email und Passwort waren korrekt");
 // 			}
-// 			console.log("Der Benutzer mit der: " + result.userid + " wurde erfolgreich von user erstellt.");
-// 			res.send(message)
+// 			});
+			
 // 		}
-// 	);
+			 
+			
+// 		});
+//  	}
+//  );
+
+	
 
 
 // POST path for database
@@ -470,7 +473,7 @@ app.post("/database", (req, res) => {
 
 // All requests to /static/... will be redirected to static files in the folder "public"
 // call it with: http://localhost:8080/static
-app.use("/static", express.static("public"));
+app.use("/static", express.static("public", {index: "startseite.html"}));
 
 // Start the actual server
 app.listen(PORT, HOST);
