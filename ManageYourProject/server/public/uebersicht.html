@@ -1,28 +1,40 @@
 <html>
-<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="css/style.css">
-        <title>Übersicht</title>
-</head>
-<body>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Übersicht</title>
+  </head>
+  <body>
     <nav>
-        <h4>ManageYourEvent</h4>
-        <ul>
-            <li><a class="aktiv" href="uebersicht.html">Übersicht</a></li>
-            <li><a href="meineEvents.html">Meine Events</a></li>
-            <li><a href="eventErstellen.html">Event erstellen</a></li>
-            <li><a class="abmelden" href="abmelden.html">Abmelden</a></li>
-        </ul>
+      <h4>ManageYourEvent</h4>
+      <ul>
+        <li><a class="aktiv" href="uebersicht.html">Übersicht</a></li>
+        <li><a href="meineEvents.html">Meine Events</a></li>
+        <li><a href="eventErstellen.html">Event erstellen</a></li>
+        <li><a class="abmelden" href="abmelden.html">Abmelden</a></li>
+      </ul>
     </nav>
+
     <menu>
         <ul>
             
@@ -34,3 +46,60 @@
     </menu>
 </body>
 </html>
+
+  </body>
+  <div class="events-container">
+        <table class='table table-striped table-hover'>
+            
+        </table>
+    </div>
+  </div>
+
+  <script>
+    function loadDoc() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          // debugger; // <- you can use the debugger for better developing in the browser
+          // console.log(this.responseText); // this can also help durring debugging in the console of the browser
+          // console.log(JSON.parse(this.responseText)); // even function output like JSON is visible in the browser console
+
+          // Parse the JSON answer from the server:
+          var row = JSON.parse(this.responseText);
+          // Start the HTML table that should be displayed:
+          // add the table hader to it
+          let txt =
+            "<tr><th scope='col'>Task ID (task_id)</th><th scope='col'>Title (title)</th><th scope='col'>Description (description)</th><th scope='col'>Created at (created_at)</th><th scope='col'>Action</th></tr>";
+          // Go through each row and add it to the table
+          /*
+          for (var x in row) {
+            txt +=
+              "<tr><td>" +
+              row[x].task_id +
+              "</td><td>" +
+              row[x].title +
+              "</td><td>" +
+              row[x].description +
+              "</td><td>" +
+              row[x].created_at +
+              "</td><td> <button class='btn btn-danger' onclick='deleteRow(" +
+              row[x].task_id +
+              ")'>DELETE</button> </td></tr>";
+          }
+          // end of the table:
+        */
+        }
+      };
+      // the "../" is required because we're in "static" folder!
+      let userId = 1;
+      xhttp.open("GET", "/offeneEvents/" + userId, true);
+      xhttp.send();
+    }
+    loadDoc();
+
+    function annehmen(eventid){
+        loadDoc();
+    }
+  </script>
+</html>
+

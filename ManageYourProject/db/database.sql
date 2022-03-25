@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: meinecooledb
--- Erstellungszeit: 16. Mrz 2022 um 14:36
+-- Erstellungszeit: 22. Mrz 2022 um 19:32
 -- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
 -- PHP-Version: 8.0.15
 
@@ -107,16 +107,17 @@ CREATE TABLE `user` (
   `userid` int(11) NOT NULL,
   `vname` varchar(20) NOT NULL,
   `nname` varchar(20) NOT NULL,
-  `email` text NOT NULL,
-  `reg_datum` date NOT NULL DEFAULT current_timestamp()
+  `email` varchar(100) NOT NULL,
+  `reg_datum` date NOT NULL DEFAULT current_timestamp(),
+  `passwort` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Daten für Tabelle `user`
 --
 
-INSERT INTO `user` (`userid`, `vname`, `nname`, `email`, `reg_datum`) VALUES
-(1, 'testname', 'testnachname', 'testperson@test.de', '2022-03-16');
+INSERT INTO `user` (`userid`, `vname`, `nname`, `email`, `reg_datum`, `passwort`) VALUES
+(1, 'testname', 'testnachname', 'testperson@test.de', '2022-03-16', '');
 
 --
 -- Indizes der exportierten Tabellen
