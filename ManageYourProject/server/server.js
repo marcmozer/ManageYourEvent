@@ -2,7 +2,14 @@
 
 const e = require("express");
 const express = require("express");
+// const session = require("express-session");
 //const bcrypt = require("bcrypt");
+//session
+// app.use(session({
+// 	secret: 'secret',
+// 	resave: true,
+// 	saveUninitialized: true
+// }));
 
 // Database
 const mysql = require("mysql");
@@ -14,10 +21,15 @@ var dbInfo = {
 	password: process.env.MYSQL_PASSWORD,
 	database: process.env.MYSQL_DATABASE,
 };
+//TODO dbInfo kopieren und für 2 abändern
 
 var connection = mysql.createPool(dbInfo);
 console.log("Conecting to database...");
 // connection.connect(); <- connect not required in connection pool
+
+//TODO für db2
+// var connection = mysql.createPool(dbInfo);
+// console.log("Conecting to database...");
 
 // SQL Database init.
 // In this current demo, this is done by the "database.sql" file which is stored in the "db"-container (./db/).
@@ -31,6 +43,7 @@ connection.query("CREATE TABLE IF NOT EXISTS table1 (task_id INT AUTO_INCREMENT 
 // See readme.md for more information about that.
 
 // Check the connection
+//TODO auch für zweite db
 connection.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
 	if (error) throw error; // <- this will throw the error and exit normally
 	// check the solution - should be 2
@@ -52,8 +65,11 @@ const HOST = "0.0.0.0";
 const app = express();
 
 // Features for JSON Body
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+//new 
+//app.use(express.static(path.join(__dirname, 'static')));
+
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
@@ -183,70 +199,57 @@ app.post("/registrierung", (req, res) => {
 						console.error(error); // <- log error in server
 						res.status(500).json(error); // <- send to client
 					}
-					console.log("Das anlegen des Nutzers "+ vname + " " + nname + " wurde erfolgreich angelegt.");
+					console.log("Das anlegen des Nutzers "+ vname + " " + nname + " war erfolgreich.");
+					res.redirect("/static/login.html");
 				}
 			);
 		}
 	});
 });
 //login
+app.post("/login", (req, res) => {
+	console.log("You are on the login Page");
+	// it will be added to the database with a query.
+	if (!req.body && !req.body.email && !req.body.passwort) {
+		// There is nobody with correct data
+		console.error("Client send no correct data!");
+		// Set HTTP Status -> 400 is client error -> and send message
+		res.status(400).json({
+			message: "This function requries a body with all fields filled out",
+		});
+	}
+	// Capture the input fields
+ 	var email = req.body.email;
+ 	var passwort = req.body.passwort;
 
-// app.post("/login", (req, res) => {
-// 	// it will be added to the database with a query.
-// 	if (!req.body && !req.body.email && !req.body.passwort) {
-// 		// There is nobody with correct data
-// 		console.error("Client send no correct data!");
-// 		// Set HTTP Status -> 400 is client error -> and send message
-// 		res.status(400).json({
-// 			message: "This function requries a body with all fields filled out",
+	 if(email && passwort ){
+		res.send("Antwort: " + email + passwort);
+		console.log(passwort + email);
+	 }
+			
+// 	// Ensure the input fields exists and are not empty
+// 	if (email && passwort) {
+// 		// Execute SQL query that'll select the account from the database based on the specified username and password
+// 		connection.query('SELECT * FROM user WHERE email = ? AND passwort = ?', [email, passwort], function(error, results, fields) {
+// 			// If there is an issue with the query, output the error
+// 			if (error) throw error;
+// 			// If the account exists
+// 			if (results.length > 0) {
+// 				// Authenticate the user
+// 				request.session.loggedin = true;
+// 				request.session.email = email;
+// 				// Redirect to uebersicht page
+// 				response.redirect('/uebersicht');
+// 			} else {
+// 				response.send('Falsche Email und/oder Passwort!');
+// 			}			
+// 			response.end();
 // 		});
+// 	} else {
+// 		response.send('Bitte gib deine Email Adresse und dein Passwort ein');
+// 		response.end();
 // 	}
-// 	// The content looks good, so move on
-// 	// Get the content to local variables:
-// 	var email = req.body.email;
-// 	var eingegebenesPasswort = req.body.passwort;
-
-// 	console.log(email + " " + eingegebenesPasswort);
-// 		res.send(email + " + " + eingegebenesPasswort);
-	// var hashedPasswort = 
-// 	connection.query("SELECT * FROM user WHERE email ='" + email + "'", 
-// 	(error, result) => {
-// 		if (error) {
-// 			// we got an errror - inform the client
-// 			console.error(error); // <- log error in server
-// 			res.status(500).json(error); // <- send to client
-// 		}console.log(email)
-// 		if(result < 1){
-// 			console.log("Kein Account mit der eingegbenen Email Adresse vorhanden");
-// 			// Send it to the client / webbrowser:
-// 			var message = "Es existiert kein Account mit der Email Adresse " + email
-// 			res.send("Antwort: " + message);
-// 		}else{
-// 			var hinterlegtesPasswort = connection.query("SELECT passwort FROM user WHERE email = '"+ email + "'" ,
-// 			(error, result) => {
-// 				console.log("Hinterlegtes Passwort = "+hinterlegtesPasswort);
-// 			if (error) {
-// 				// we got an errror - inform the client
-// 				console.error(error); // <- log error in server
-// 				res.status(500).json(error); // <- send to client
-// 			}else if(hinterlegtesPasswort != eingegebenesPasswort){
-// 					console.log("Falsches Passwort eingegeben");
-// 					// Send it to the client / webbrowser:
-// 					var message = "Es wurde ein falsches Passwort eingegeben-"
-// 					res.send("Antwort: " + message);
-// 			}else{
-// 				res.redirect("/uebersicht.html");
-// 				console.log("Email und Passwort waren korrekt");
-// 			}
-// 			});
-			
-// 		}
-			 
-			
-// 		});
-//  	}
-//  );
-
+ });
 	
 
 
@@ -475,9 +478,11 @@ app.post("/database", (req, res) => {
 // call it with: http://localhost:8080/static
 app.use("/static", express.static("public", {index: "startseite.html"}));
 
+// app.use(session())
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
+
 
 // Start database connection
 const sleep = (milliseconds) => {
