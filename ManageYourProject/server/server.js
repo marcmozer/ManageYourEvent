@@ -2,8 +2,8 @@
 
 const e = require("express");
 const express = require("express");
-// const session = require("express-session");
-//const bcrypt = require("bcrypt");
+//const session = require("express-session");
+const bcrypt = require("bcrypt");
 //session
 // app.use(session({
 // 	secret: 'secret',
@@ -178,56 +178,53 @@ app.post("/registrierung", (req, res) => {
 		}
 		else{
 			//TODO Passwort hashen
-			// bcrypt.hash(passwort, 10, (err, hash) => {
-			// 	if (err) {
-			// 	  throw err;
-			// 	}
-			// 	console.log('Your hash: ', hash);
-			//   });
-			connection.query(
-				//TODO passwort in query hinzufügen
-				"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
-					nname +
-					"', '" +
-					vname +
-					"', '" +
-					email +
-					"', '" +
-					passwort +
-					"')",
-				(error, result) => {
-					if (error) {
-						// we got an errror - inform the client
-						console.error(error); // <- log error in server
-						res.status(500).json(error); // <- send to client
-					}
-					console.log("Das anlegen des Nutzers "+ vname + " " + nname + " war erfolgreich.");
-					res.redirect("/static/login.html");
+			bcrypt.hash(passwort, 10, (err, hash) => {
+				if (err) {
+				  throw err;
 				}
-			);
+				console.log('Your hash: ', hash);
+				connection.query(
+					//TODO passwort in query hinzufügen
+					"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" +
+						nname +
+						"', '" +
+						vname +
+						"', '" +
+						email +
+						"', '" +
+						hash +
+						"')",
+					(error, result) => {
+						if (error) {
+							// we got an errror - inform the client
+							console.error(error); // <- log error in server
+							res.status(500).json(error); // <- send to client
+						}
+						console.log("Das anlegen des Nutzers "+ vname + " " + nname + " war erfolgreich.");
+						res.redirect("/static/login.html");
+					}
+				);
+			  });
+			  
+			
 		}
 	});
 });
 //login
-app.post("/login", (req, res) => {
-	console.log("You are on the login Page");
-	// it will be added to the database with a query.
-	if (!req.body && !req.body.email && !req.body.passwort) {
-		// There is nobody with correct data
-		console.error("Client send no correct data!");
-		// Set HTTP Status -> 400 is client error -> and send message
-		res.status(400).json({
-			message: "This function requries a body with all fields filled out",
-		});
-	}
-	// Capture the input fields
- 	var email = req.body.email;
- 	var passwort = req.body.passwort;
-
-	 if(email && passwort ){
-		res.send("Antwort: " + email + passwort);
-		console.log(passwort + email);
-	 }
+// app.post("/login", (req, res) => {
+// 	console.log("You are on the login Page");
+// 	// it will be added to the database with a query.
+// 	if (!req.body && !req.body.email && !req.body.passwort) {
+// 		// There is nobody with correct data
+// 		console.error("Client send no correct data!");
+// 		// Set HTTP Status -> 400 is client error -> and send message
+// 		res.status(400).json({
+// 			message: "This function requries a body with all fields filled out",
+// 		});
+// 	}
+// 	// Capture the input fields
+//  	var email = req.body.email;
+//  	var passwort = req.body.passwort;
 			
 // 	// Ensure the input fields exists and are not empty
 // 	if (email && passwort) {
@@ -251,7 +248,7 @@ app.post("/login", (req, res) => {
 // 		response.send('Bitte gib deine Email Adresse und dein Passwort ein');
 // 		response.end();
 // 	}
- });
+//  });
 	
 
 
@@ -477,9 +474,9 @@ app.post('/database', (req, res) => {
 
 // All requests to /static/... will be redirected to static files in the folder "public"
 // call it with: http://localhost:8080/static
-app.use('/static', express.static('public'))
+app.use("/static", express.static("public", {index: "startseite.html"}));
 
-// app.use(session())
+//app.use(session())
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
