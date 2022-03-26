@@ -284,29 +284,31 @@ app.post("/eventErstellen", (req, res) => {
 
 //GET path for for open events where you can still participate
 app.get("/offeneEvents/:userId", (req, res) => {
-	connection.query("SELECT * FROM event", (eventError, events) => {
-		if (eventError) {
-			// we got an errror - inform the client
-			console.error(eventError); // <- log error in server
-			res.status(500).json(eventError); // <- send to client
-		}
-		connection.query("SELECT * FROM eventzusage WHERE userid=" + req.params.userId, async (zusagenError, zusagen) => {
-			if (zusagenError) {
+	connection.query(
+		"SELECT * FROM event WHERE event.teilnehmer_anzahl < (SELECT COUNT(*) FROM eventzusage WHERE eventzusage.eventid = event.eventid AND eventzusage.zusage = 1)",
+		(eventError, events) => {
+			if (eventError) {
 				// we got an errror - inform the client
-				console.error(zusagenError); // <- log error in server
-				res.status(500).json(zusagenError); // <- send to client
+				console.error(eventError); // <- log error in server
+				res.status(500).json(eventError); // <- send to client
 			}
+			connection.query("SELECT * FROM eventzusage WHERE userid=" + req.params.userId, async (zusagenError, zusagen) => {
+				if (zusagenError) {
+					// we got an errror - inform the client
+					console.error(zusagenError); // <- log error in server
+					res.status(500).json(zusagenError); // <- send to client
+				}
 
-			for (let i = 0; i < events.length; i++) {
-				for (let j = 0; j < zusagen.length; j++) {
-					if (events[i].eventid == zusagen[j].eventid) {
-						events.splice(i, 1); // delete element on position i (Event has already been accepted/cancelled by user)
-						i--;
-						break;
+				for (let i = 0; i < events.length; i++) {
+					for (let j = 0; j < zusagen.length; j++) {
+						if (events[i].eventid == zusagen[j].eventid) {
+							events.splice(i, 1); // delete element on position i (Event has already been accepted/cancelled by user)
+							i--;
+							break;
+						}
 					}
 				}
-			}
-			for (let i = 0; i < events.length; i++) {
+				/*for (let i = 0; i < events.length; i++) {
 				connection.query("SELECT COUNT(*) as teilnehmerAnzahl FROM eventzusage WHERE eventzusage.eventid = " + events[i].eventid, (zusagenAnzahlError, zusagenAnzahl) => {
 					if (zusagenAnzahlError) {
 						// we got an errror - inform the client
@@ -319,12 +321,13 @@ app.get("/offeneEvents/:userId", (req, res) => {
 					}
 				});
 				await sleep(100);
-			}
-			console.log("Events for user: " + userId + " has been successfully loaded and will be returned.");
-			// Everything is fine with the query
-			res.status(200).json({}); // <- send it to client
-		});
-	});
+			}*/
+				console.log("Events for user: " + userId + " has been successfully loaded and will be returned.");
+				// Everything is fine with the query
+				res.status(200).json(events); // <- send it to client
+			});
+		}
+	);
 });
 
 //function assigns the correct id/user to the event acceptance
