@@ -43,11 +43,13 @@ menu {
 menu ul{
     display: flex;
     justify-content: space-around;
-    align-items: center;   
+    align-items: center;
+    
 }
 menu li{
     list-style: none;
-}
+    }
+    
 menu li a{
     color: #fff;
     text-decoration: none;
@@ -57,4 +59,17 @@ menu li a{
 menu li a:hover{
     color: greenyellow;
     text-decoration: none;
+}
+div.ueberschrift{
+    background-color: rgb(84, 87, 87);
+    color: #fff;
+    padding: 10px 60px;
+    display: flex;
+    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+}
+div.ueberschrift h5{
+    text-align: center; 
+    justify-content:center;
 }
