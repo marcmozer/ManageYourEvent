@@ -10,11 +10,14 @@ services:
       MYSQL_USER: exampleuser
       MYSQL_PASSWORD: examplepass
       MYSQL_HOSTNAME: meinecooledb
+    
     links:
       - meinecooledb
+      #2
     depends_on:
       - meinecooledb
   meinecooledb:
+  # nachfolgendes kopieren
     # Use of a modified datbase in 'db'-folder.
     # See README.md for more information.
     build: db
