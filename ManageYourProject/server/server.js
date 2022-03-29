@@ -128,6 +128,49 @@ app.get("/button2", (req, res) => {
 });
 // ###################### BUTTON EXAMPLE END ######################
 
+//login
+app.post("/login", (req, res) => {
+	console.log("You are on the login Page");
+	// it will be added to the database with a query.
+	if (!req.body && !req.body.email && !req.body.passwort) {
+		// There is nobody with correct data
+		console.error("Client send no correct data!");
+		// Set HTTP Status -> 400 is client error -> and send message
+		res.status(400).json({
+			message: "This function requries a body with all fields filled out",
+		});
+	}
+	// Capture the input fields
+ 	var email = req.body.email;
+ 	var passwort = req.body.passwort;
+		console.log(email, passwort);
+			
+	// Ensure the input fields exists and are not empty
+	if (email && passwort) {
+		// Execute SQL query that'll select the account from the database based on the specified username and password
+		connection.query('SELECT * FROM user WHERE email = ? AND passwort = ?', [email, passwort], function(error, results, fields) {
+			// If there is an issue with the query, output the error
+			if (error) throw error;
+			// If the account exists
+			if (results.length > 0) {
+				// Authenticate the user
+				request.session.loggedin = true;
+				request.session.email = email;
+				// Redirect to uebersicht page
+				response.redirect('/uebersicht');
+			} else {
+				response.send('Falsche Email und/oder Passwort!');
+			}			
+			response.end();
+		});
+	} else {
+		response.send('Bitte gib deine Email Adresse und dein Passwort ein');
+	
+		response.end();
+		
+	}
+ });
+
 // registration
 app.post("/registrierung", (req, res) => {
 	// it will be added to the database with a query.
@@ -197,47 +240,8 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
-//login
-// app.post("/login", (req, res) => {
-// 	console.log("You are on the login Page");
-// 	// it will be added to the database with a query.
-// 	if (!req.body && !req.body.email && !req.body.passwort) {
-// 		// There is nobody with correct data
-// 		console.error("Client send no correct data!");
-// 		// Set HTTP Status -> 400 is client error -> and send message
-// 		res.status(400).json({
-// 			message: "This function requries a body with all fields filled out",
-// 		});
-// 	}
-// 	// Capture the input fields
-//  	var email = req.body.email;
-//  	var passwort = req.body.passwort;
 
-// 	// Ensure the input fields exists and are not empty
-// 	if (email && passwort) {
-// 		// Execute SQL query that'll select the account from the database based on the specified username and password
-// 		connection.query('SELECT * FROM user WHERE email = ? AND passwort = ?', [email, passwort], function(error, results, fields) {
-// 			// If there is an issue with the query, output the error
-// 			if (error) throw error;
-// 			// If the account exists
-// 			if (results.length > 0) {
-// 				// Authenticate the user
-// 				request.session.loggedin = true;
-// 				request.session.email = email;
-// 				// Redirect to uebersicht page
-// 				response.redirect('/uebersicht');
-// 			} else {
-// 				response.send('Falsche Email und/oder Passwort!');
-// 			}
-// 			response.end();
-// 		});
-// 	} else {
-// 		response.send('Bitte gib deine Email Adresse und dein Passwort ein');
-// 		response.end();
-// 	}
-//  });
-
-// POST path for database to create an event
+// POST path for database
 app.post("/eventErstellen", (req, res) => {
 	// it will be added to the database with a query.
 	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl && !req.body.userid) {
