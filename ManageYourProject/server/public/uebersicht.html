@@ -35,59 +35,57 @@
       </ul>
     </nav>
 
-    <menu>
-        <ul>
-            
-                <li><a href="oeffentlicheEvents.html">Öffentliche Events</a></li>
-                <li><a href="eventEinladungen.html">Eventeinladungen</a></li>
-               
-        </ul>
-        
-    </menu>
+  <div class="ueberschrift">
+    <h5>Vorgeschlagene Events</h5>                
+  </div>
+      
 </body>
 </html>
 
+  
+    </body>
   </body>
-  <div class="events-container">
-        <table class='table table-striped table-hover'>
-            
-        </table>
-    </div>
-  </div>
+<div class="events-container">
+  <table id="testtable" class='table table-striped table-hover'>
+    Loading....
+  </table>
+</div>
+
+
+
+
+           
 
   <script>
+    // The loadDoc()-function will load the table into the defined space
     function loadDoc() {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          // debugger; // <- you can use the debugger for better developing in the browser
-          // console.log(this.responseText); // this can also help durring debugging in the console of the browser
-          // console.log(JSON.parse(this.responseText)); // even function output like JSON is visible in the browser console
-
           // Parse the JSON answer from the server:
           var row = JSON.parse(this.responseText);
           // Start the HTML table that should be displayed:
+          var txt = "<table class='table table-striped table-hover'>";
           // add the table hader to it
-          let txt =
-            "<tr><th scope='col'>Task ID (task_id)</th><th scope='col'>Title (title)</th><th scope='col'>Description (description)</th><th scope='col'>Created at (created_at)</th><th scope='col'>Action</th></tr>";
+          txt +=  "<tr><th scope='col'>Titel</th><th scope='col'>Beschreibung </th><th scope='col'>geplantes Datum</th><th scope='col'>Kommentar</th><th scope='col'>Annehmen/Ablehnen</th></tr>"
           // Go through each row and add it to the table
-          /*
+          
           for (var x in row) {
             txt +=
-              "<tr><td>" +
-              row[x].task_id +
+            "<tr><td>" +
+              row[x].titel +
               "</td><td>" +
-              row[x].title +
+              row[x].beschreibung +
               "</td><td>" +
-              row[x].description +
-              "</td><td>" +
-              row[x].created_at +
-              "</td><td> <button class='btn btn-danger' onclick='deleteRow(" +
-              row[x].task_id +
-              ")'>DELETE</button> </td></tr>";
+              row[x].geplantes_datum +
+              "</td><td> <button class='btn btn-danger' onclick='zusagen(" +
+              row[x].eventid +
+              ")'>Annehmen</button> </td></tr>";
           }
+          txt += "<tr><td></td><td><input id='titel' type='text' name='titel' class='form-control' value='Titel'></td><td><input id='beschreibung' type='text' name='beschreibung' class='form-control' value='Beschreibung'></td><td><input id='geplantes_datum' type='date' name='geplantes Datum' class='form-control' value='geplantes Datum'></td><td></td><td> <button class='btn btn-success' onclick='zusagen()'>Annehmen</button> </td></tr>"
           // end of the table:
-        */
+        txt += "</table>"
+        document.getElementById("testtable").innerHTML = txt;
         }
       };
       // the "../" is required because we're in "static" folder!
@@ -101,5 +99,7 @@
         loadDoc();
     }
   </script>
+</body>
+
 </html>
 

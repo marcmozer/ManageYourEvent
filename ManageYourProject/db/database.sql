@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: meinecooledb
--- Erstellungszeit: 22. Mrz 2022 um 19:32
+-- Erstellungszeit: 26. Mrz 2022 um 16:36
 -- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
 -- PHP-Version: 8.0.15
 
@@ -32,15 +32,17 @@ CREATE TABLE `event` (
   `titel` varchar(40) NOT NULL,
   `beschreibung` text NOT NULL,
   `adminid` int(11) NOT NULL DEFAULT 0,
-  `geplantes_datum` date NOT NULL
+  `geplantes_datum` date NOT NULL,
+  `teilnehmer_anzahl` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Daten für Tabelle `event`
 --
 
-INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`) VALUES
-(1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18');
+INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`, `teilnehmer_anzahl`) VALUES
+(1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18', 0),
+(2, 'Versuch', 'mal sehen ob es klappt', 2, '2022-03-02', 12);
 
 -- --------------------------------------------------------
 
@@ -61,7 +63,8 @@ CREATE TABLE `eventzusage` (
 --
 
 INSERT INTO `eventzusage` (`ezid`, `userid`, `eventid`, `kommentar`, `zusage`) VALUES
-(1, 1, 1, 'Ich nehme gerne daran teil', 1);
+(1, 1, 1, 'Ich nehme gerne daran teil', 1),
+(2, 1, 2, '', 0);
 
 -- --------------------------------------------------------
 
@@ -95,7 +98,8 @@ CREATE TABLE `table1` (
 INSERT INTO `table1` (`task_id`, `title`, `description`, `created_at`) VALUES
 (1, 'Super titel', 'langer text', '2020-04-09 12:18:07'),
 (2, 'Anderer Titel', 'Super Text', '2020-04-09 12:18:43'),
-(3, 'Anderer Titel2', 'noch mehr text', '2020-04-09 12:18:57');
+(3, 'Anderer Titel2', 'noch mehr text', '2020-04-09 12:18:57'),
+(4, 'Title', 'Description', '2022-03-26 15:55:27');
 
 -- --------------------------------------------------------
 
@@ -117,7 +121,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`userid`, `vname`, `nname`, `email`, `reg_datum`, `passwort`) VALUES
-(1, 'testname', 'testnachname', 'testperson@test.de', '2022-03-16', '');
+(1, 'testname', 'testnachname', 'testperson@test.de', '2022-03-16', ''),
+(2, 'ewad', 'qweqwe', 'test.@de', '2022-03-26', '$2b$10$2ENoIsV8vfx487q8eANsgOj9C0uKqia9iuaJNl4o06QfUMZdCjUwe');
 
 --
 -- Indizes der exportierten Tabellen
@@ -165,13 +170,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT für Tabelle `eventzusage`
 --
 ALTER TABLE `eventzusage`
-  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT für Tabelle `login`
@@ -183,13 +188,13 @@ ALTER TABLE `login`
 -- AUTO_INCREMENT für Tabelle `table1`
 --
 ALTER TABLE `table1`
-  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
