@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: meinecooledb
--- Erstellungszeit: 26. Mrz 2022 um 16:36
+-- Erstellungszeit: 29. Mrz 2022 um 22:27
 -- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
 -- PHP-Version: 8.0.15
 
@@ -33,16 +33,18 @@ CREATE TABLE `event` (
   `beschreibung` text NOT NULL,
   `adminid` int(11) NOT NULL DEFAULT 0,
   `geplantes_datum` date NOT NULL,
-  `teilnehmer_anzahl` int(11) NOT NULL
+  `teilnehmer_anzahl` int(11) NOT NULL,
+  `geplante_uhrzeit` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Daten für Tabelle `event`
 --
 
-INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`, `teilnehmer_anzahl`) VALUES
-(1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18', 0),
-(2, 'Versuch', 'mal sehen ob es klappt', 2, '2022-03-02', 12);
+INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`, `teilnehmer_anzahl`, `geplante_uhrzeit`) VALUES
+(1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18', 0, '00:00:00'),
+(2, 'Versuch', 'mal sehen ob es klappt', 2, '2022-03-02', 12, '00:00:00'),
+(3, '12345346', 'cfewr', 1, '2222-02-23', 34, '03:02:00');
 
 -- --------------------------------------------------------
 
@@ -64,7 +66,9 @@ CREATE TABLE `eventzusage` (
 
 INSERT INTO `eventzusage` (`ezid`, `userid`, `eventid`, `kommentar`, `zusage`) VALUES
 (1, 1, 1, 'Ich nehme gerne daran teil', 1),
-(2, 1, 2, '', 0);
+(3, 1, 3, 'Eventersteller', 1),
+(4, 1, 2, 'wdsasdad', 1),
+(5, 2, 2, 'unter Vorbehalt', 1);
 
 -- --------------------------------------------------------
 
@@ -170,13 +174,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT für Tabelle `eventzusage`
 --
 ALTER TABLE `eventzusage`
-  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT für Tabelle `login`
