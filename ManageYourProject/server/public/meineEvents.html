@@ -25,45 +25,109 @@
         </ul>
     </nav>
 
+	<!-- Buttons to decide which informations should be shown -->
 <menu>
     <ul>
-        
-            <li><a href="zugesagteEvents.html">Zugesagte Events</a></li>
-            <li><a href="selbsterstellteEvents.html">Selbst erstellte Events</a></li>
-
-
+            <button onclick="hideTable('zugesagte')">Zugesagte Events&nbsp;</button>
+            <button onclick="hideTable('selbstErstellte')">Selbst erstellte Events</button>
     </ul>
-    
 </menu>
+	
+	<!-- define the place where the events will be listed -->
+<div id="zugesagteEvents">
+	<table id="zugesagteEventstable" class="table table-striped table-hover">
+</table></div>
+<div id="selbstErstellteEvents" style="display: none;" >
+	<table id="selbstErstellteEventstable" class="table table-striped table-hover">
+</table></div>
 
 </body>
 	<script>
-		let userId = 1;
+		//function to hide the other information if one of the buttons is clicked
+		function hideTable(tableName){
+			if(tableName=="zugesagte"){
+				document.getElementById("selbstErstellteEvents").style.display="none";
+				document.getElementById("zugesagteEvents").style.display = "";
+			}else if(tableName=="selbstErstellte"){
+				document.getElementById("zugesagteEvents").style.display = "none";
+				document.getElementById("selbstErstellteEvents").style.display = "";
+			}
+		}
+
+		window.userId = 1;
 
 		// get zugesagte Events
+		function loadDoc(){
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
-				var zugesagteEvents = JSON.parse(this.responseText);
-				document.getElementById("events").innerHTML = "<p>row</p>";
+				// Parse the JSON answer from the server:
+				var row = JSON.parse(this.responseText);
+				// Start the HTML table that should be displayed:
 				console.log(zugesagteEvents);
-				// hier for each schleife einfügen, die Tabelleneinträge für jedes zugesagteEvent erstellt (siehe database.html loadDoc function)
+				var txt = "<table class='table table-striped table-hover'>";
+				// add the table hader to it
+				txt +=
+					"<tr><th scope='col'>Titel</th><th scope='col'>Beschreibung </th><th scope='col'>geplantes Datum</th></tr>";
+				// Go through each row and add it to the table
+				for (var x in row) {
+					let index = row[x].geplantes_datum.indexOf("T"); //crop the date to display correctly
+					row[x].geplantes_datum = row[x].geplantes_datum.substring(0, index);
+
+					txt +=
+						"<tr><td>" +
+						row[x].titel +
+						"</td><td>" +
+						row[x].beschreibung +
+						"</td><td>" +
+						row[x].geplantes_datum +
+						"</td>";					
+				}
+				// end of the table:
+				txt += "</table>";
+				document.getElementById("zugesagteEventstable").innerHTML = txt;
 			}
 		};
-		xhttp.open("GET", "/zugesagteEvents/" + userId, true);
+		// the "../" is required because we're in "static" folder!
+		xhttp.open("GET", "/zugesagteEvents/" + window.userId, true);
 		xhttp.send();
+		}
 
 		// get selbst erstellte Events
-		xhttp = new XMLHttpRequest();
+		function loadDoc(){
+		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
-				var selbstErstellteEvents = JSON.parse(this.responseText);
-				console.log(selbstErstellteEvents);
-				// hier for each schleife einfügen, die Tabelleneinträge für jedes selbstErstellteEvent erstellt (siehe database.html loadDoc function)
+				// Parse the JSON answer from the server:
+				var row = JSON.parse(this.responseText);
+				// Start the HTML table that should be displayed:
+				var txt = "<table class='table table-striped table-hover'>";
+				// add the table hader to it
+				txt +=
+					"<tr><th scope='col'>Titel</th><th scope='col'>Beschreibung </th><th scope='col'>geplantes Datum</th></tr>";
+				// Go through each row and add it to the table
+				for (var x in row) {
+					let index = row[x].geplantes_datum.indexOf("T"); //crop the date to display correctly
+					row[x].geplantes_datum = row[x].geplantes_datum.substring(0, index);
+
+					txt +=
+						"<tr><td>" +
+						row[x].titel +
+						"</td><td>" +
+						row[x].beschreibung +
+						"</td><td>" +
+						row[x].geplantes_datum +
+						"</td>";
+				}
+				// end of the table:
+				txt += "</table>";
+				document.getElementById("selbstErstellteEventstable").innerHTML = txt;
 			}
 		};
-		xhttp.open("GET", "/selbstErstellteEvents/" + userId, true);
+		xhttp.open("GET", "/selbstErstellteEvents/" + window.userId, true);
 		xhttp.send();
+	}
+	loadDoc();
 	</script>
 </html>
 

@@ -1,6 +1,6 @@
 "use strict";
 
-const e = require("express");
+var cors = require("cors");
 const express = require("express");
 //const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -63,7 +63,7 @@ const HOST = "0.0.0.0";
 
 // App
 const app = express();
-
+app.use(cors());
 // Features for JSON Body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -141,14 +141,14 @@ app.post("/login", (req, res) => {
 		});
 	}
 	// Capture the input fields
- 	var email = req.body.email;
- 	var passwort = req.body.passwort;
-		console.log(email, passwort);
-			
+	var email = req.body.email;
+	var passwort = req.body.passwort;
+	console.log(email, passwort);
+
 	// Ensure the input fields exists and are not empty
 	if (email && passwort) {
 		// Execute SQL query that'll select the account from the database based on the specified username and password
-		connection.query('SELECT * FROM user WHERE email = ? AND passwort = ?', [email, passwort], function(error, results, fields) {
+		connection.query("SELECT * FROM user WHERE email = ? AND passwort = ?", [email, passwort], function (error, results, fields) {
 			// If there is an issue with the query, output the error
 			if (error) throw error;
 			// If the account exists
@@ -157,19 +157,18 @@ app.post("/login", (req, res) => {
 				request.session.loggedin = true;
 				request.session.email = email;
 				// Redirect to uebersicht page
-				response.redirect('/uebersicht');
+				response.redirect("/uebersicht");
 			} else {
-				response.send('Falsche Email und/oder Passwort!');
-			}			
+				response.send("Falsche Email und/oder Passwort!");
+			}
 			response.end();
 		});
 	} else {
-		response.send('Bitte gib deine Email Adresse und dein Passwort ein');
-	
+		response.send("Bitte gib deine Email Adresse und dein Passwort ein");
+
 		response.end();
-		
 	}
- });
+});
 
 // registration
 app.post("/registrierung", (req, res) => {
@@ -289,7 +288,7 @@ app.post("/eventErstellen", (req, res) => {
 //GET path for for open events where you can still participate
 app.get("/offeneEvents/:userId", (req, res) => {
 	connection.query(
-		"SELECT * FROM event WHERE event.teilnehmer_anzahl < (SELECT COUNT(*) FROM eventzusage WHERE eventzusage.eventid = event.eventid AND eventzusage.zusage = 1)",
+		"SELECT * FROM event WHERE event.teilnehmer_anzahl > (SELECT COUNT(*) FROM eventzusage WHERE eventzusage.eventid = event.eventid AND eventzusage.zusage = 1)",
 		(eventError, events) => {
 			if (eventError) {
 				// we got an errror - inform the client
@@ -326,7 +325,7 @@ app.get("/offeneEvents/:userId", (req, res) => {
 				});
 				await sleep(100);
 			}*/
-				console.log("Events for user: " + userId + " has been successfully loaded and will be returned.");
+				console.log("Events for user: " + req.params.userId + " has been successfully loaded and will be returned.");
 				// Everything is fine with the query
 				res.status(200).json(events); // <- send it to client
 			});
