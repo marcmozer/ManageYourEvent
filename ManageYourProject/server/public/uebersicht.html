@@ -35,29 +35,15 @@
       </ul>
     </nav>
 
-<<<<<<< HEAD
   <div class="ueberschrift">
     <h5>Vorgeschlagene Events</h5>                
   </div>
-      
-</body>
-</html>
-
-=======
-  
-    </body>
->>>>>>> 88a87ec400187be82fb7fd2b8b965f50d71826d6
-  </body>
+       
 <div class="events-container">
   <table id="testtable" class='table table-striped table-hover'>
     Loading....
   </table>
 </div>
-
-
-
-
-           
 
   <script>
     // The loadDoc()-function will load the table into the defined space
@@ -93,7 +79,7 @@
       };
       // the "../" is required because we're in "static" folder!
       let userId = 1;
-      xhttp.open("GET", "/offeneEvents/" + userId, true);
+      xhttp.open("GET", "/offeneEvents/:userId" + userId, true);
       xhttp.send();
     }
     loadDoc();
@@ -106,3 +92,4 @@
 
 </html>
 
+//https://medium.com/@jesussantizo120/next-js-project-flash-cards-da08745512d8
