@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: meinecooledb
--- Erstellungszeit: 29. Mrz 2022 um 22:27
+-- Erstellungszeit: 30. Mrz 2022 um 08:24
 -- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
 -- PHP-Version: 8.0.15
 
@@ -44,7 +44,8 @@ CREATE TABLE `event` (
 INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`, `teilnehmer_anzahl`, `geplante_uhrzeit`) VALUES
 (1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18', 0, '00:00:00'),
 (2, 'Versuch', 'mal sehen ob es klappt', 2, '2022-03-02', 12, '00:00:00'),
-(3, '12345346', 'cfewr', 1, '2222-02-23', 34, '03:02:00');
+(3, '12345346', 'cfewr', 1, '2222-02-23', 34, '03:02:00'),
+(4, 'Nachholtermin ', 'Aufgrund früherer Krankheit wird der Termin nun nachgeholt.', 2, '2022-03-02', 13, '18:30:40');
 
 -- --------------------------------------------------------
 
@@ -174,7 +175,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT für Tabelle `eventzusage`
