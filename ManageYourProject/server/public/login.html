@@ -29,7 +29,7 @@
                 Anmeldung
             </div>
             <div class="card-body">
-                <form>
+                <form action="/login/" method="POST">
                 <div class="form-group">
                     <label for="email">E-Mail Adresse</label>
                     <input type="email" class="form-control" id="email" name = "email"> 
@@ -40,12 +40,25 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Anmelden</button>
+               
                 </form>
+               
             </div> 
         </div>
     </div>
-    <script>
-        
-    </script>
+
+	<script>
+	    // function loadDoc() {
+        //     var xhttp = new XMLHttpRequest();
+        //         xhttp.onreadystatechange = function () {
+        //             if (this.readyState == 4 && this.status == 200) {
+        //                     document.getElementById("target").innerHTML = this.responseText;
+        //                 }
+        //             };
+        //         // the "../" is required because we're in "static" folder!
+        //         xhttp.open("GET", "/login", true);
+        //         xhttp.send();
+		// }
+	</script>
 </body>
 </html>

@@ -144,31 +144,77 @@ app.post("/login", (req, res) => {
 	var email = req.body.email;
 	var passwort = req.body.passwort;
 	console.log(email, passwort);
-
+	
 	// Ensure the input fields exists and are not empty
 	if (email && passwort) {
-		// Execute SQL query that'll select the account from the database based on the specified username and password
-		connection.query("SELECT * FROM user WHERE email = ? AND passwort = ?", [email, passwort], function (error, results, fields) {
-			// If there is an issue with the query, output the error
-			if (error) throw error;
-			// If the account exists
-			if (results.length > 0) {
-				// Authenticate the user
-				request.session.loggedin = true;
-				request.session.email = email;
-				// Redirect to uebersicht page
-				response.redirect("/uebersicht");
-			} else {
-				response.send("Falsche Email und/oder Passwort!");
+		//TODO bcryp hash
+		connection.query("SELECT * FROM user WHERE email = '" + email + "'", (error, result) => {
+			if (error) {
+				// we got an errror - inform the client
+				console.error(error); // <- log error in server
+				res.status(500).json(error); // <- send to client
 			}
-			response.end();
-		});
-	} else {
-		response.send("Bitte gib deine Email Adresse und dein Passwort ein");
-
-		response.end();
+			console.log("query wurde ausgeführt");
+			if (!result.length) {
+				res.send("Email oder Passwort sind falsch");
+			}
+			bcrypt.compare(passwort, result[0]["passwort"], (bErr, bResult)=>{
+				if(bErr){
+					res.send("Email oder Passwort sind falsch");
+					throw bErr;
+				}else if(bResult){ //passwordsMatch
+					console.log("Passwörter stimmen überein");
+					res.redirect("/static/uebersicht.html");
+					//TODO sessions einbinden + abmeldung schreiben
+				}
+			});
+		 	
+		});  
 	}
-});
+}); 
+			  
+	
+		// 	  var isValid =  bcrypt.compare(passwort, hinterlegtesPasswort);
+		// 	  console.log(hinterlegtesPasswort + " " + passwort + " " + isValid);
+		// 	  if (isValid) {
+		// 		//PASSWORD MATCHED
+		// 		res.redirect("/uebersicht.html");
+		// 		res.end();
+		// 	  } else {
+		// 		console.log(" Passwort ist nicht korrekt");
+		// 		res.redirect("/login.html");
+		// 		res.end();
+		// 		return;
+		// 	  }
+		// }
+		
+		// bcrypt.compare(hinterlegtesPasswort, passwort) => {
+		// 	if (err) {
+		// 		throw err;
+		// 	}
+		// 	console.log(hash + " " + passwort);
+		// 	// Execute SQL query that'll select the account from the database based on the specified username and password
+		// 	connection.query("SELECT * FROM user WHERE email = ? AND passwort = ?", [email, hash], function (error, results, fields) {
+		// 		// If there is an issue with the query, output the error
+		// 		if (error) {
+		// 			// we got an errror - inform the client
+		// 			console.error(error); // <- log error in server
+		// 			res.status(500).json(error); // <- send to client
+		// 		}
+		// 		// If the account exists
+		// 		if (results.length > 0) {
+		// 			// Authenticate the user
+		// 			// req.session.loggedin = true;
+		// 			// req.session.email = email;
+		// 			// Redirect to uebersicht page
+		// 			res.redirect("/uebersicht");
+		// 		} else {
+		// 			res.send("Falsche Email und/oder Passwort!");
+		// 		}
+		// 		res.end();
+		 	// });
+		//  );
+		 
 
 // registration
 app.post("/registrierung", (req, res) => {
@@ -202,19 +248,19 @@ app.post("/registrierung", (req, res) => {
 			console.log("Es gibt bereits einen Nutzer mit der Email Adresse: " + email);
 			// Send it to the client / webbrowser:
 			var message = "Die Email Adresse ist bereits vergeben.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else if (passwort.length < 8) {
 			//check if password has the right length
 			console.log("Das eingegebenen passswort ist nur " + passwort.length + " Zeichen lang");
 			// Send it to the client / webbrowser:
 			var message = "Das Passwort muss mindestens 8 Zeichen lang sein.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else if (passwort !== passwortWiederholen) {
 			//check if password matches with the repeated password
 			console.log("Die eingegebenen Passwörter " + passwort + " und " + passwortWiederholen + " stimmen nicht überein.");
 			// Send it to the client / webbrowser:
 			var message = "Die Passwörter stimmen nicht überein.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else {
 			//TODO Passwort hashen
 			bcrypt.hash(passwort, 10, (err, hash) => {
