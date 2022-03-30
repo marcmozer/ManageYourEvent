@@ -46,20 +46,19 @@ menu ul{
     align-items: center;
     
 }
-menu li{
-    list-style: none;
+menu button {
+    justify-content: space-around;
+    color: black;
+    margin-left: 20px;
     }
+menu button:hover {
+    color: blue;
+    box-shadow: 5px 5px 10px grey;
+}
+menu button:focus {
+    color: blue;
+}
     
-menu li a{
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 5px 8px;
-}
-menu li a:hover{
-    color: greenyellow;
-    text-decoration: none;
-}
 div.ueberschrift{
     background-color: rgb(84, 87, 87);
     color: #fff;
