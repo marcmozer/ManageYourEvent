@@ -60,7 +60,7 @@ const HOST = "0.0.0.0";
 const app = express();
 //session
 app.use(session({
-	secret: 'secret',
+	secret: 'thisismysecretsession1223434',
 	resave: true,
 	saveUninitialized: true
 }));
@@ -69,8 +69,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //Features for Session
-const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
+// const path = require('path');
+app.use(express.static(__dirname));
 
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
@@ -131,6 +131,16 @@ app.get("/button2", (req, res) => {
 });
 // ###################### BUTTON EXAMPLE END ######################
 
+//checking function if session is running
+// const validateSession = (req,res,next) =>{
+// 	if(!req.session.userid){
+// 		res.redirect("/static/login.html");
+// 		console.log("Redirected zu Login")
+// 	}else{
+// 		next();
+// 	}
+// }
+
 //login
 app.post("/login", (req, res) => {
 	console.log("You are on the login Page");
@@ -168,8 +178,8 @@ app.post("/login", (req, res) => {
 					if(bResult){ //passwordsMatch
 						console.log("Passwörter stimmen überein");
 						// Authenticate the user
-						req.session.loggedin = true;
-						req.session.email = email;
+						req.session.userid = email;
+						console.log(req.session.userid);
 						//Redirect to uebersicht page
 						res.redirect("/static/uebersicht.html");
 					}else{
@@ -185,6 +195,7 @@ app.post("/login", (req, res) => {
 		res.end();
 	}
 }); 		 
+
 
 // registration
 app.post("/registrierung", (req, res) => {
@@ -255,26 +266,49 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
+var authenticate = function (req, res, next) {
+	// your validation code goes here. 
+	if (req.session.userid) {
+	  next();
+	  console.log("authenticate was true");
+	}
+	else {
+	  res.redirect("/static/login.html");
+	  console.log("authenticate redirected to login")
+	}
+  }
 
 //logout
-app.post("/abmelden", (req, res) => {
-	req.session.destroy(function (err) {
-	  res.redirect('/static'); 
-	 });
+app.post("/abmelden", authenticate, (req, res, next) => {
+	
+		// end session and redirect to /static
+		req.session.destroy();
+		console.log("session got destroyed")
+		res.redirect('/static'); 
+	 
   })
-// app.get('/uebersicht', (req, res)=> {
-// 	// If the user is loggedin
-// 	if (req.session.loggedin) {
-// 		// Output username
-// 		console.log("wir sind in der Session");
-// 	} else {
-// 		// Not logged in
-// 		res.send('Please login to view this page!');
-// 	}
-// 	res.end();
-// });
+app.post("/uebersicht", (req, res)=> {
+	// If the user is loggedin
+	if (req.session.userid) {
+		// Output username
+		console.log("wir sind in der Session");
+	} else {
+		// Not logged in
+		res.send('Please login to view this page!');
+	}
+	res.end();
+});
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
+	console.log(req.session.userid);
+	if (req.session.userid) {
+		// Output username
+		console.log("wir sind in der Session");
+	} else {
+		// Not logged in
+		res.send('Please login to view this page!');
+	}
+	res.end();
 	// it will be added to the database with a query.
 	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl && !req.body.userid) {
 		// There is nobody with correct data
