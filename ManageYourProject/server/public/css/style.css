@@ -72,3 +72,6 @@ div.ueberschrift h5{
     text-align: center; 
     justify-content:center;
 }
+td button.btn-success{
+    margin-right: 10px;
+}
