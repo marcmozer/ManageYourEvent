@@ -2,14 +2,9 @@
 
 var cors = require("cors");
 const express = require("express");
-//const session = require("express-session");
+const session = require("express-session");
 const bcrypt = require("bcrypt");
-//session
-// app.use(session({
-// 	secret: 'secret',
-// 	resave: true,
-// 	saveUninitialized: true
-// }));
+
 
 // Database
 const mysql = require("mysql");
@@ -63,12 +58,20 @@ const HOST = "0.0.0.0";
 
 // App
 const app = express();
+//session
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
 app.use(cors());
 // Features for JSON Body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//new
-//app.use(express.static(path.join(__dirname, 'static')));
+//Features for Session
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
@@ -144,31 +147,44 @@ app.post("/login", (req, res) => {
 	var email = req.body.email;
 	var passwort = req.body.passwort;
 	console.log(email, passwort);
-
+	
 	// Ensure the input fields exists and are not empty
 	if (email && passwort) {
-		// Execute SQL query that'll select the account from the database based on the specified username and password
-		connection.query("SELECT * FROM user WHERE email = ? AND passwort = ?", [email, passwort], function (error, results, fields) {
-			// If there is an issue with the query, output the error
-			if (error) throw error;
-			// If the account exists
-			if (results.length > 0) {
-				// Authenticate the user
-				request.session.loggedin = true;
-				request.session.email = email;
-				// Redirect to uebersicht page
-				response.redirect("/uebersicht");
-			} else {
-				response.send("Falsche Email und/oder Passwort!");
+		//TODO bcryp hash
+		connection.query("SELECT * FROM user WHERE email = '" + email + "'", (error, result) => {
+			if (error) {
+				// we got an errror - inform the client
+				console.error(error); // <- log error in server
+				res.status(500).json(error); // <- send to client
 			}
-			response.end();
-		});
-	} else {
-		response.send("Bitte gib deine Email Adresse und dein Passwort ein");
-
-		response.end();
+			console.log("query wurde ausgeführt");
+			if (!result.length) {
+				res.send("Email oder Passwort sind falsch");
+			}else{
+				bcrypt.compare(passwort, result[0]["passwort"], (bErr, bResult)=>{
+					if(bErr){
+						throw bErr;
+					}
+					if(bResult){ //passwordsMatch
+						console.log("Passwörter stimmen überein");
+						// Authenticate the user
+						req.session.loggedin = true;
+						req.session.email = email;
+						//Redirect to uebersicht page
+						res.redirect("/static/uebersicht.html");
+					}else{
+						res.send("Email oder Passwort sind falsch");
+						
+					}
+					res.end();
+				});
+			}
+		});  
+	}else{
+		res.send("Bitte geben sie ihre Email und ihr Passwort ein");
+		res.end();
 	}
-});
+}); 		 
 
 // registration
 app.post("/registrierung", (req, res) => {
@@ -202,19 +218,19 @@ app.post("/registrierung", (req, res) => {
 			console.log("Es gibt bereits einen Nutzer mit der Email Adresse: " + email);
 			// Send it to the client / webbrowser:
 			var message = "Die Email Adresse ist bereits vergeben.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else if (passwort.length < 8) {
 			//check if password has the right length
 			console.log("Das eingegebenen passswort ist nur " + passwort.length + " Zeichen lang");
 			// Send it to the client / webbrowser:
 			var message = "Das Passwort muss mindestens 8 Zeichen lang sein.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else if (passwort !== passwortWiederholen) {
 			//check if password matches with the repeated password
 			console.log("Die eingegebenen Passwörter " + passwort + " und " + passwortWiederholen + " stimmen nicht überein.");
 			// Send it to the client / webbrowser:
 			var message = "Die Passwörter stimmen nicht überein.";
-			res.send("Antwort: " + message);
+			res.send(message);
 		} else {
 			//TODO Passwort hashen
 			bcrypt.hash(passwort, 10, (err, hash) => {
@@ -240,6 +256,23 @@ app.post("/registrierung", (req, res) => {
 	});
 });
 
+//logout
+app.post("/abmelden", (req, res) => {
+	req.session.destroy(function (err) {
+	  res.redirect('/static'); 
+	 });
+  })
+// app.get('/uebersicht', (req, res)=> {
+// 	// If the user is loggedin
+// 	if (req.session.loggedin) {
+// 		// Output username
+// 		console.log("wir sind in der Session");
+// 	} else {
+// 		// Not logged in
+// 		res.send('Please login to view this page!');
+// 	}
+// 	res.end();
+// });
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
 	// it will be added to the database with a query.
@@ -472,7 +505,7 @@ app.post("/database", (req, res) => {
 // call it with: http://localhost:8080/static
 app.use("/static", express.static("public", { index: "startseite.html" }));
 
-//app.use(session())
+app.use(session())
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
