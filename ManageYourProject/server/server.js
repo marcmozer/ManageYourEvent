@@ -243,14 +243,14 @@ app.post("/registrierung", (req, res) => {
 			var message = "Die Passwörter stimmen nicht überein.";
 			res.send(message);
 		} else {
-			//TODO Passwort hashen
+			//hash password
 			bcrypt.hash(passwort, 10, (err, hash) => {
 				if (err) {
 					throw err;
 				}
 				console.log("Your hash: ", hash);
 				connection.query(
-					//TODO passwort in query hinzufügen
+					//fill hashed password into database
 					"INSERT INTO user (`nname`, `vname`, `email`, `passwort`) VALUES ('" + nname + "', '" + vname + "', '" + email + "', '" + hash + "')",
 					(error, result) => {
 						if (error) {
@@ -266,38 +266,41 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
-var authenticate = function (req, res, next) {
-	// your validation code goes here. 
-	if (req.session.userid) {
-	  next();
-	  console.log("authenticate was true");
-	}
-	else {
-	  res.redirect("/static/login.html");
-	  console.log("authenticate redirected to login")
-	}
-  }
+// var authenticate = function (req, res, next) {
+// 	// your validation code goes here. 
+// 	if (req.session.userid) {
+// 	  next();
+// 	  console.log("authenticate was true");
+// 	}
+// 	else {
+// 	  res.redirect("/static/login.html");
+// 	  console.log("authenticate redirected to login")
+// 	}
+//   }
 
+  app.use('/abmelden', (req, res, next) =>{
+	console.log("bin in app.use");
+	console.log(req.session.userid);
+	//add your code to run every time route is hit
+	if (req.session.userid) {
+		next();
+		console.log("authenticate was true");
+	  }
+	  else {
+		res.redirect("/static/login.html");
+		console.log("authenticate redirected to login");
+	  }
+  });
 //logout
-app.post("/abmelden", authenticate, (req, res, next) => {
-	
+app.post("/abmelden", (req, res, next) => {
+		
 		// end session and redirect to /static
 		req.session.destroy();
-		console.log("session got destroyed")
+		console.log("session got destroyed");
 		res.redirect('/static'); 
 	 
   })
-app.post("/uebersicht", (req, res)=> {
-	// If the user is loggedin
-	if (req.session.userid) {
-		// Output username
-		console.log("wir sind in der Session");
-	} else {
-		// Not logged in
-		res.send('Please login to view this page!');
-	}
-	res.end();
-});
+
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
 	console.log(req.session.userid);
@@ -538,6 +541,11 @@ app.post("/database", (req, res) => {
 // All requests to /static/... will be redirected to static files in the folder "public"
 // call it with: http://localhost:8080/static
 app.use("/static", express.static("public", { index: "startseite.html" }));
+
+
+
+ 
+  
 
 app.use(session())
 // Start the actual server
