@@ -199,7 +199,7 @@ app.post("/login", (req, res) => {
 						req.session.userid = email;
 						console.log(req.session.userid);
 						//Redirect to uebersicht page
-						res.redirect("/static/uebersicht.html");
+						res.redirect("/private/uebersicht.html");
 					}else{
 						res.send("Email oder Passwort sind falsch");
 						
@@ -285,7 +285,7 @@ app.post("/registrierung", (req, res) => {
 	});
 });
 	// checks for private pages if session is started and user logged in
-app.use('/abmelden', (req, res, next) =>{
+app.use('/private', (req, res, next) =>{
 	console.log("bin in app.use");
 	console.log(req.session.userid);
 	//add your code to run every time route is hit
@@ -298,45 +298,45 @@ app.use('/abmelden', (req, res, next) =>{
 		console.log("authenticate redirected to login");
 	  }
   });
-  app.use('/uebersicht', (req, res, next) =>{
-	console.log("bin in app.use");
-	console.log(req.session.userid);
-	//if there is no active session, functions on the page don't work and user gets redirected to login
-	if (req.session.userid) {
-		next();
-		console.log("authenticate was true");
-	  }
-	  else {
-		res.redirect("/static/login.html");
-		console.log("authenticate redirected to login");
-	  }
-  });
-  app.use('/meineEvents', (req, res, next) =>{
-	console.log("bin in app.use");
-	console.log(req.session.userid);
-	//add your code to run every time route is hit
-	if (req.session.userid) {
-		next();
-		console.log("authenticate was true");
-	  }
-	  else {
-		res.redirect("/static/login.html");
-		console.log("authenticate redirected to login");
-	  }
-  });
-  app.use('/eventErstellen', (req, res, next) =>{
-	console.log("bin in app.use");
-	console.log(req.session.userid);
-	//add your code to run every time route is hit
-	if (req.session.userid) {
-		next();
-		console.log("authenticate was true");
-	  }
-	  else {
-		res.redirect("/static/login.html");
-		console.log("authenticate redirected to login");
-	  }
-  });
+//   app.use('/uebersicht', (req, res, next) =>{
+// 	console.log("bin in app.use");
+// 	console.log(req.session.userid);
+// 	//if there is no active session, functions on the page don't work and user gets redirected to login
+// 	if (req.session.userid) {
+// 		next();
+// 		console.log("authenticate was true");
+// 	  }
+// 	  else {
+// 		res.redirect("/static/login.html");
+// 		console.log("authenticate redirected to login");
+// 	  }
+//   });
+//   app.use('/meineEvents', (req, res, next) =>{
+// 	console.log("bin in app.use");
+// 	console.log(req.session.userid);
+// 	//add your code to run every time route is hit
+// 	if (req.session.userid) {
+// 		next();
+// 		console.log("authenticate was true");
+// 	  }
+// 	  else {
+// 		res.redirect("/static/login.html");
+// 		console.log("authenticate redirected to login");
+// 	  }
+//   });
+//   app.use('/eventErstellen', (req, res, next) =>{
+// 	console.log("bin in app.use");
+// 	console.log(req.session.userid);
+// 	//add your code to run every time route is hit
+// 	if (req.session.userid) {
+// 		next();
+// 		console.log("authenticate was true");
+// 	  }
+// 	  else {
+// 		res.redirect("/static/login.html");
+// 		console.log("authenticate redirected to login");
+// 	  }
+//   });
 
 //logout
 app.post("/abmelden", (req, res) => {
@@ -588,7 +588,11 @@ app.post("/database", (req, res) => {
 // call it with: http://localhost:8080/static
 app.use("/static", express.static("public", { index: "startseite.html" }));
 
+app.use("/private", express.static("private"));
 
+
+// add public files. List all "private" paths (file)
+// app.use(secureStatic(['uebersicht.html']));
 
  
   

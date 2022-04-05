@@ -1,0 +1,77 @@
+nav{
+    background-color: cadetblue;
+    color: #fff;
+    padding: 30px 60px;
+    display: flex;
+    justify-content: space-between;
+}
+nav ul{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+nav li{
+list-style: none;
+}
+
+nav li a{
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 8px;
+}
+nav li a:hover{
+    color: yellow;
+    text-decoration: none;
+}
+nav li a.aktiv{
+    color: black;
+    text-decoration: none;
+}
+nav li a.abmelden:hover{
+    color: red;
+    text-decoration: none;
+}
+menu { 
+    background-color: rgb(84, 87, 87);
+    color: #fff;
+    padding: 10px 60px;
+    display: flex;
+    justify-content: space-between;
+}
+menu ul{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+}
+menu button {
+    justify-content: space-around;
+    color: black;
+    margin-left: 20px;
+    }
+menu button:hover {
+    color: blue;
+    box-shadow: 5px 5px 10px grey;
+}
+menu button:focus {
+    color: blue;
+}
+    
+div.ueberschrift{
+    background-color: rgb(84, 87, 87);
+    color: #fff;
+    padding: 10px 60px;
+    display: flex;
+    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+}
+div.ueberschrift h5{
+    text-align: center; 
+    justify-content:center;
+}
+td button.btn-success{
+    margin-right: 10px;
+}
