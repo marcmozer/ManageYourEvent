@@ -284,19 +284,8 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
-// var authenticate = function (req, res, next) {
-// 	// your validation code goes here. 
-// 	if (req.session.userid) {
-// 	  next();
-// 	  console.log("authenticate was true");
-// 	}
-// 	else {
-// 	  res.redirect("/static/login.html");
-// 	  console.log("authenticate redirected to login")
-// 	}
-//   }
-
-  app.use('/abmelden', (req, res, next) =>{
+	// checks for private pages if session is started and user logged in
+app.use('/abmelden', (req, res, next) =>{
 	console.log("bin in app.use");
 	console.log(req.session.userid);
 	//add your code to run every time route is hit
@@ -312,6 +301,19 @@ app.post("/registrierung", (req, res) => {
   app.use('/uebersicht', (req, res, next) =>{
 	console.log("bin in app.use");
 	console.log(req.session.userid);
+	//if there is no active session, functions on the page don't work and user gets redirected to login
+	if (req.session.userid) {
+		next();
+		console.log("authenticate was true");
+	  }
+	  else {
+		res.redirect("/static/login.html");
+		console.log("authenticate redirected to login");
+	  }
+  });
+  app.use('/meineEvents', (req, res, next) =>{
+	console.log("bin in app.use");
+	console.log(req.session.userid);
 	//add your code to run every time route is hit
 	if (req.session.userid) {
 		next();
@@ -322,36 +324,22 @@ app.post("/registrierung", (req, res) => {
 		console.log("authenticate redirected to login");
 	  }
   });
-  //TODO testen ob login funktioniert
-//   app.use('/meineEvents', (req, res, next) =>{
-// 	console.log("bin in app.use");
-// 	console.log(req.session.userid);
-// 	//add your code to run every time route is hit
-// 	if (req.session.userid) {
-// 		next();
-// 		console.log("authenticate was true");
-// 	  }
-// 	  else {
-// 		res.redirect("/static/login.html");
-// 		console.log("authenticate redirected to login");
-// 	  }
-//   });
-//   app.use('/eventErstellen', (req, res, next) =>{
-// 	console.log("bin in app.use");
-// 	console.log(req.session.userid);
-// 	//add your code to run every time route is hit
-// 	if (req.session.userid) {
-// 		next();
-// 		console.log("authenticate was true");
-// 	  }
-// 	  else {
-// 		res.redirect("/static/login.html");
-// 		console.log("authenticate redirected to login");
-// 	  }
-//   });
+  app.use('/eventErstellen', (req, res, next) =>{
+	console.log("bin in app.use");
+	console.log(req.session.userid);
+	//add your code to run every time route is hit
+	if (req.session.userid) {
+		next();
+		console.log("authenticate was true");
+	  }
+	  else {
+		res.redirect("/static/login.html");
+		console.log("authenticate redirected to login");
+	  }
+  });
+
 //logout
-app.get("/abmelden", (req, res, next) => {
-		
+app.post("/abmelden", (req, res) => {
 		// end session and redirect to /static
 		req.session.destroy();
 		console.log("session got destroyed");
