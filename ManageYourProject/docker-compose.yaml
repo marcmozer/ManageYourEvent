@@ -9,14 +9,23 @@ services:
       MYSQL_DATABASE: exampledb
       MYSQL_USER: exampleuser
       MYSQL_PASSWORD: examplepass
-      MYSQL_HOSTNAME: meinecooledb
+      MYSQL_HOSTNAME: host1
+
+      MYSQL_DATABASE2: exampledb2
+      MYSQL_USER2: exampleuser2
+      MYSQL_PASSWORD2: examplepass2
+      MYSQL_HOSTNAME2: host2
+
     
     links:
-      - meinecooledb
-      #2
+      - host1
+      - host2
+      
     depends_on:
-      - meinecooledb
-  meinecooledb:
+      - host1
+      - host2 
+
+  host1:
   # nachfolgendes kopieren
     # Use of a modified datbase in 'db'-folder.
     # See README.md for more information.
@@ -27,10 +36,34 @@ services:
       MYSQL_USER: exampleuser
       MYSQL_PASSWORD: examplepass
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_RANDOM_ROOT_PASSWORD: '12'
+  
+  host2:
+  # nachfolgendes kopieren
+    # Use of a modified datbase in 'db'-folder.
+    # See README.md for more information.
+    build: backup_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb2
+      MYSQL_USER: exampleuser2
+      MYSQL_PASSWORD: examplepass2
+      MYSQL_RANDOM_ROOT_PASSWORD: '2'
+      MARIADB_RANDOM_ROOT_PASSWORD: '23'    
+
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
       - 8085:80
     environment:
-      PMA_HOST: meinecooledb
+      PMA_HOST: host1
+
+  phpmyadmin2:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8086:80
+    environment:
+      PMA_HOST: host2

@@ -16,15 +16,20 @@ var dbInfo = {
 	password: process.env.MYSQL_PASSWORD,
 	database: process.env.MYSQL_DATABASE,
 };
-//TODO dbInfo kopieren und für 2 abändern
 
+var dbInfo2 = {
+	connectionLimit: 10,
+	host: process.env.MYSQL_HOSTNAME2,
+	user: process.env.MYSQL_USER2,
+	password: process.env.MYSQL_PASSWORD2,
+	database: process.env.MYSQL_DATABASE2,
+};
 var connection = mysql.createPool(dbInfo);
-console.log("Conecting to database...");
+console.log("Conecting to database1");
 // connection.connect(); <- connect not required in connection pool
 
-//TODO für db2
-// var connection = mysql.createPool(dbInfo);
-// console.log("Conecting to database...");
+ var connection2 = mysql.createPool(dbInfo2);
+ console.log("Connecting to database2");
 
 // SQL Database init.
 // In this current demo, this is done by the "database.sql" file which is stored in the "db"-container (./db/).
@@ -37,9 +42,22 @@ connection.query("CREATE TABLE IF NOT EXISTS table1 (task_id INT AUTO_INCREMENT 
 */
 // See readme.md for more information about that.
 
-// Check the connection
-//TODO auch für zweite db
+// Check the connection for connection
 connection.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
+	if (error) throw error; // <- this will throw the error and exit normally
+	// check the solution - should be 2
+	if (results[0].solution == 2) {
+		// everything is fine with the database
+		console.log("Database connected and works");
+	} else {
+		// connection is not fine - please check
+		console.error("There is something wrong with your database connection! Please check");
+		process.exit(5); // <- exit application with error code e.g. 5
+	}
+});
+
+// Check the connection for connection2
+connection2.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
 	if (error) throw error; // <- this will throw the error and exit normally
 	// check the solution - should be 2
 	if (results[0].solution == 2) {
@@ -291,8 +309,48 @@ app.post("/registrierung", (req, res) => {
 		console.log("authenticate redirected to login");
 	  }
   });
+  app.use('/uebersicht', (req, res, next) =>{
+	console.log("bin in app.use");
+	console.log(req.session.userid);
+	//add your code to run every time route is hit
+	if (req.session.userid) {
+		next();
+		console.log("authenticate was true");
+	  }
+	  else {
+		res.redirect("/static/login.html");
+		console.log("authenticate redirected to login");
+	  }
+  });
+  //TODO testen ob login funktioniert
+//   app.use('/meineEvents', (req, res, next) =>{
+// 	console.log("bin in app.use");
+// 	console.log(req.session.userid);
+// 	//add your code to run every time route is hit
+// 	if (req.session.userid) {
+// 		next();
+// 		console.log("authenticate was true");
+// 	  }
+// 	  else {
+// 		res.redirect("/static/login.html");
+// 		console.log("authenticate redirected to login");
+// 	  }
+//   });
+//   app.use('/eventErstellen', (req, res, next) =>{
+// 	console.log("bin in app.use");
+// 	console.log(req.session.userid);
+// 	//add your code to run every time route is hit
+// 	if (req.session.userid) {
+// 		next();
+// 		console.log("authenticate was true");
+// 	  }
+// 	  else {
+// 		res.redirect("/static/login.html");
+// 		console.log("authenticate redirected to login");
+// 	  }
+//   });
 //logout
-app.post("/abmelden", (req, res, next) => {
+app.get("/abmelden", (req, res, next) => {
 		
 		// end session and redirect to /static
 		req.session.destroy();

@@ -2,7 +2,7 @@
 -- version 5.1.3
 -- https://www.phpmyadmin.net/
 --
--- Host: host1
+-- Host: host2
 -- Erstellungszeit: 30. Mrz 2022 um 08:24
 -- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
 -- PHP-Version: 8.0.15
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `exampledb`
+-- Datenbank: `exampledb2`
 --
 
 -- --------------------------------------------------------
