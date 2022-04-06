@@ -5,7 +5,6 @@ const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
 
-
 // Database
 const mysql = require("mysql");
 // Database connection info - used from environment variables
@@ -28,8 +27,8 @@ var connection = mysql.createPool(dbInfo);
 console.log("Conecting to database1");
 // connection.connect(); <- connect not required in connection pool
 
- var connection2 = mysql.createPool(dbInfo2);
- console.log("Connecting to database2");
+var connection2 = mysql.createPool(dbInfo2);
+console.log("Connecting to database2");
 
 // SQL Database init.
 // In this current demo, this is done by the "database.sql" file which is stored in the "db"-container (./db/).
@@ -77,11 +76,13 @@ const HOST = "0.0.0.0";
 // App
 const app = express();
 //session
-app.use(session({
-	secret: 'thisismysecretsession1223434',
-	resave: true,
-	saveUninitialized: true
-}));
+app.use(
+	session({
+		secret: "thisismysecretsession1223434",
+		resave: true,
+		saveUninitialized: true,
+	})
+);
 app.use(cors());
 // Features for JSON Body
 app.use(express.json());
@@ -90,7 +91,6 @@ app.use(express.urlencoded({ extended: true }));
 // const path = require('path');
 app.use(express.static(__dirname));
 
-
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
 	console.log("Got a request and redirect it to the static page");
@@ -98,56 +98,11 @@ app.get("/", (req, res) => {
 	res.redirect("/static");
 });
 
-// Another GET Path - call it with: http://localhost:8080/special_path
-app.get("/special_path", (req, res) => {
-	res.send("This is another path");
-});
-
 // Another GET Path that shows the actual Request (req) Headers - call it with: http://localhost:8080/request_info
 app.get("/request_info", (req, res) => {
 	console.log("Request content:", req);
 	res.send("This is all I got from the request:" + JSON.stringify(req.headers));
 });
-
-// POST Path - call it with: POST http://localhost:8080/client_post
-app.post("/client_post", (req, res) => {
-	if (typeof req.body !== "undefined" && typeof req.body.post_content !== "undefined") {
-		var post_content = req.body.post_content;
-		console.log("Client send 'post_content' with content:", post_content);
-		// Set HTTP Status -> 200 is okay -> and send message
-		res.status(200).json({ message: "I got your message: " + post_content });
-	} else {
-		// There is no body and post_contend
-		console.error("Client send no 'post_content'");
-		// Set HTTP Status -> 400 is client error -> and send message
-		res.status(400).json({ message: 'This function requries a body with "post_content"' });
-	}
-});
-
-// ###################### BUTTON EXAMPLE ######################
-// POST path for Button 1
-app.post("/button1_name", (req, res) => {
-	// Load the name from the formular. This is the ID of the input:
-	const name = req.body.name;
-	// Print it out in console:
-	console.log("Client send the following name: " + name + " | Button1");
-	// Send JSON message back - this could be also HTML instead.
-	res.status(200).json({ message: "I got your message - Name is: " + name });
-	// More information here: https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms
-});
-
-// GET path for Button 2
-app.get("/button2", (req, res) => {
-	// This will generate a random number and send it back:
-	const random_number = Math.random();
-	// Print it out in console:
-	console.log("Send the following random number to the client: " + random_number + " | Button2");
-	// Send it to the client / webbrowser:
-	res.send("Antwort: " + random_number);
-	// Instead of plain TXT - the answer could be a JSON
-	// More information here: https://www.w3schools.com/xml/ajax_intro.asp
-});
-// ###################### BUTTON EXAMPLE END ######################
 
 //checking function if session is running
 // const validateSession = (req,res,next) =>{
@@ -175,7 +130,7 @@ app.post("/login", (req, res) => {
 	var email = req.body.email;
 	var passwort = req.body.passwort;
 	console.log(email, passwort);
-	
+
 	// Ensure the input fields exists and are not empty
 	if (email && passwort) {
 		//TODO bcryp hash
@@ -188,32 +143,31 @@ app.post("/login", (req, res) => {
 			console.log("query wurde ausgeführt");
 			if (!result.length) {
 				res.send("Email oder Passwort sind falsch");
-			}else{
-				bcrypt.compare(passwort, result[0]["passwort"], (bErr, bResult)=>{
-					if(bErr){
+			} else {
+				bcrypt.compare(passwort, result[0]["passwort"], (bErr, bResult) => {
+					if (bErr) {
 						throw bErr;
 					}
-					if(bResult){ //passwordsMatch
+					if (bResult) {
+						//passwordsMatch
 						console.log("Passwörter stimmen überein");
 						// Authenticate the user
 						req.session.userid = email;
 						console.log(req.session.userid);
 						//Redirect to uebersicht page
 						res.redirect("/private/uebersicht.html");
-					}else{
+					} else {
 						res.send("Email oder Passwort sind falsch");
-						
 					}
 					res.end();
 				});
 			}
-		});  
-	}else{
+		});
+	} else {
 		res.send("Bitte geben sie ihre Email und ihr Passwort ein");
 		res.end();
 	}
-}); 		 
-
+});
 
 // registration
 app.post("/registrierung", (req, res) => {
@@ -284,20 +238,19 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
-	// checks for private pages if session is started and user logged in
-app.use('/private/', (req, res, next) =>{
+// checks for private pages if session is started and user logged in
+app.use("/private", (req, res, next) => {
 	console.log("bin in app.use");
 	console.log(req.session.userid);
 	//add your code to run every time route is hit
 	if (req.session.userid) {
 		next();
 		console.log("authenticate was true");
-	  }
-	  else {
+	} else {
 		res.redirect("/static/login.html");
 		console.log("authenticate redirected to login");
-	  }
-  });
+	}
+});
 //   app.use('/uebersicht', (req, res, next) =>{
 // 	console.log("bin in app.use");
 // 	console.log(req.session.userid);
@@ -340,13 +293,12 @@ app.use('/private/', (req, res, next) =>{
 
 //logout
 app.post("/abmelden", (req, res) => {
-		// end session and redirect to /static
-		req.session.destroy();
-		console.log("session got destroyed");
-		res.redirect('/static'); 
-	 
-  })
-
+	// end session and redirect to /static
+	req.session.destroy();
+	console.log("session got destroyed");
+	res.redirect("/static");
+});
+// ###################### EventErstellen PART ######################
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
 	console.log(req.session.userid);
@@ -355,7 +307,7 @@ app.post("/eventErstellen", (req, res) => {
 		console.log("wir sind in der Session");
 	} else {
 		// Not logged in
-		res.send('Please login to view this page!');
+		res.send("Please login to view this page!");
 	}
 	res.end();
 	// it will be added to the database with a query.
@@ -400,6 +352,7 @@ app.post("/eventErstellen", (req, res) => {
 		}
 	);
 });
+// ###################### EventErstellen PART END ######################
 
 //GET path for for open events where you can still participate
 app.get("/offeneEvents/:userId", (req, res) => {
@@ -427,20 +380,6 @@ app.get("/offeneEvents/:userId", (req, res) => {
 						}
 					}
 				}
-				/*for (let i = 0; i < events.length; i++) {
-				connection.query("SELECT COUNT(*) as teilnehmerAnzahl FROM eventzusage WHERE eventzusage.eventid = " + events[i].eventid, (zusagenAnzahlError, zusagenAnzahl) => {
-					if (zusagenAnzahlError) {
-						// we got an errror - inform the client
-						console.error(zusagenAnzahlError); // <- log error in server
-						res.status(500).json(zusagenAnzahlError); // <- send to client
-					}
-					if (zusagenAnzahl[0].teilnehmerAnzahl >= events[i]["teilnehmer_anzahl"]) {
-						events.splice(i, 1); // delete element on position i (Event already has maximum number of participants)
-						i--;
-					}
-				});
-				await sleep(100);
-			}*/
 				console.log("Events for user: " + req.params.userId + " has been successfully loaded and will be returned.");
 				// Everything is fine with the query
 				res.status(200).json(events); // <- send it to client
@@ -507,97 +446,16 @@ app.get("/selbstErstellteEvents/:userId", (req, res) => {
 	});
 });
 
-// ###################### DATABASE PART ######################
-// GET path for database
-app.get("/database", (req, res) => {
-	console.log("Request to load all entries from table1");
-	// Prepare the get query
-	connection.query("SELECT * FROM `table1`;", function (error, results, fields) {
-		if (error) {
-			// we got an errror - inform the client
-			console.error(error); // <- log error in server
-			res.status(500).json(error); // <- send to client
-		} else {
-			// we got no error - send it to the client
-			console.log("Success answer from DB: ", results); // <- log results in console
-			// INFO: Here could be some code to modify the result
-			res.status(200).json(results); // <- send it to client
-		}
-	});
-});
-
-// DELETE path for database
-app.delete("/database/:id", (req, res) => {
-	// This path will delete an entry. For example the path would look like DELETE '/database/5' -> This will delete number 5
-	let id = req.params.id; // <- load the ID from the path
-	console.log("Request to delete Item: " + id); // <- log for debugging
-
-	// Actual executing the query to delete it from the server
-	// Please keep in mind to secure this for SQL injection!
-	connection.query("DELETE FROM `table1` WHERE `table1`.`task_id` = " + id + ";", function (error, results, fields) {
-		if (error) {
-			// we got an errror - inform the client
-			console.error(error); // <- log error in server
-			res.status(500).json(error); // <- send to client
-		} else {
-			// Everything is fine with the query
-			console.log("Success answer: ", results); // <- log results in console
-			// INFO: Here can be some checks of modification of the result
-			res.status(200).json(results); // <- send it to client
-		}
-	});
-});
-
-// POST path for database
-app.post("/database", (req, res) => {
-	// This will add a new row. So we're getting a JSON from the webbrowser which needs to be checked for correctness and later
-	// it will be added to the database with a query.
-	if (typeof req.body !== "undefined" && typeof req.body.title !== "undefined" && typeof req.body.description !== "undefined") {
-		// The content looks good, so move on
-		// Get the content to local variables:
-		var title = req.body.title;
-		var description = req.body.description;
-		console.log("Client send database insert request with 'title': " + title + " ; description: " + description); // <- log to server
-		// Actual executing the query. Please keep in mind that this is for learning and education.
-		// In real production environment, this has to be secure for SQL injection!
-		connection.query(
-			"INSERT INTO `table1` (`task_id`, `title`, `description`, `created_at`) VALUES (NULL, '" + title + "', '" + description + "', current_timestamp());",
-			function (error, results, fields) {
-				if (error) {
-					// we got an errror - inform the client
-					console.error(error); // <- log error in server
-					res.status(500).json(error); // <- send to client
-				} else {
-					// Everything is fine with the query
-					console.log("Success answer: ", results); // <- log results in console
-					// INFO: Here can be some checks of modification of the result
-					res.status(200).json(results); // <- send it to client
-				}
-			}
-		);
-	} else {
-		// There is nobody with a title nor description
-		console.error("Client send no correct data!");
-		// Set HTTP Status -> 400 is client error -> and send message
-		res.status(400).json({ message: 'This function requries a body with "title" and "description' });
-	}
-});
-// ###################### DATABASE PART END ######################
-
 // All requests to /static/... will be redirected to static files in the folder "public"
 // call it with: http://localhost:8080/static
 app.use("/static", express.static("public", { index: "startseite.html" }));
 
 app.use("/private", express.static("private"));
 
-
 // add public files. List all "private" paths (file)
 // app.use(secureStatic(['uebersicht.html']));
 
- 
-  
-
-app.use(session())
+app.use(session());
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
