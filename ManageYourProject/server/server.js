@@ -88,8 +88,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //Features for Session
+
 // const path = require('path');
-app.use(express.static(__dirname));
+// app.use(express.static(__dirname));
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
@@ -239,57 +240,21 @@ app.post("/registrierung", (req, res) => {
 	});
 });
 // checks for private pages if session is started and user logged in
-app.use("/private", (req, res, next) => {
+app.use("/private/*", (req, res, next) => {
 	console.log("bin in app.use");
 	console.log(req.session.userid);
 	//add your code to run every time route is hit
 	if (req.session.userid) {
-		next();
 		console.log("authenticate was true");
+		app.use(express.static('private/'));
+		
 	} else {
+		//app.use(express.static('pubilc/login'));
 		res.redirect("/static/login.html");
 		console.log("authenticate redirected to login");
 	}
+	next();
 });
-//   app.use('/uebersicht', (req, res, next) =>{
-// 	console.log("bin in app.use");
-// 	console.log(req.session.userid);
-// 	//if there is no active session, functions on the page don't work and user gets redirected to login
-// 	if (req.session.userid) {
-// 		next();
-// 		console.log("authenticate was true");
-// 	  }
-// 	  else {
-// 		res.redirect("/static/login.html");
-// 		console.log("authenticate redirected to login");
-// 	  }
-//   });
-//   app.use('/meineEvents', (req, res, next) =>{
-// 	console.log("bin in app.use");
-// 	console.log(req.session.userid);
-// 	//add your code to run every time route is hit
-// 	if (req.session.userid) {
-// 		next();
-// 		console.log("authenticate was true");
-// 	  }
-// 	  else {
-// 		res.redirect("/static/login.html");
-// 		console.log("authenticate redirected to login");
-// 	  }
-//   });
-//   app.use('/eventErstellen', (req, res, next) =>{
-// 	console.log("bin in app.use");
-// 	console.log(req.session.userid);
-// 	//add your code to run every time route is hit
-// 	if (req.session.userid) {
-// 		next();
-// 		console.log("authenticate was true");
-// 	  }
-// 	  else {
-// 		res.redirect("/static/login.html");
-// 		console.log("authenticate redirected to login");
-// 	  }
-//   });
 
 //logout
 app.post("/abmelden", (req, res) => {
