@@ -285,7 +285,7 @@ app.post("/registrierung", (req, res) => {
 	});
 });
 	// checks for private pages if session is started and user logged in
-app.use('/private', (req, res, next) =>{
+app.use('/private/', (req, res, next) =>{
 	console.log("bin in app.use");
 	console.log(req.session.userid);
 	//add your code to run every time route is hit
