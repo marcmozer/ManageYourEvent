@@ -2,54 +2,47 @@ version: '3.3'
 services:
   server:
     build: server
-    ports:
-      - "8080:8080"
     restart: always
     environment:
       MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
       MYSQL_HOSTNAME: host1
-
-      MYSQL_DATABASE2: exampledb2
-      MYSQL_USER2: exampleuser2
-      MYSQL_PASSWORD2: examplepass2
-      MYSQL_HOSTNAME2: host2
-
-    
-    links:
-      - host1
-      - host2
-      
     depends_on:
       - host1
-      - host2 
+      - host2
 
-  host1:
-  # nachfolgendes kopieren
-    # Use of a modified datbase in 'db'-folder.
-    # See README.md for more information.
-    build: db
+  server2:
+    build: server
     restart: always
     environment:
       MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
-      MARIADB_RANDOM_ROOT_PASSWORD: '12'
-  
-  host2:
-  # nachfolgendes kopieren
-    # Use of a modified datbase in 'db'-folder.
-    # See README.md for more information.
-    build: backup_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_HOSTNAME: host1
+    depends_on:
+      - host1
+      - host2
+
+  host1:
+    build: db/master
     restart: always
     environment:
-      MYSQL_DATABASE: exampledb2
-      MYSQL_USER: exampleuser2
-      MYSQL_PASSWORD: examplepass2
-      MYSQL_RANDOM_ROOT_PASSWORD: '2'
-      MARIADB_RANDOM_ROOT_PASSWORD: '23'    
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MARIADB_ROOT_PASSWORD: 'root' #needs root rights for master-slave connection
+  
+  host2:
+    build: db/slave
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MARIADB_ROOT_PASSWORD: 'root' #needs root rights for master-slave connection
+    depends_on:
+      - host1
 
 
   phpmyadmin:
@@ -59,7 +52,7 @@ services:
       - 8085:80
     environment:
       PMA_HOST: host1
-
+  
   phpmyadmin2:
     image: phpmyadmin/phpmyadmin
     restart: always
@@ -67,3 +60,12 @@ services:
       - 8086:80
     environment:
       PMA_HOST: host2
+
+  loadbalancer:
+    build: loadbalancer
+    restart: always
+    ports:
+      - '8080:80'
+    depends_on:
+      - server
+      - server2
