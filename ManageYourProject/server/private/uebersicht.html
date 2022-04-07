@@ -41,8 +41,6 @@
 		</div>
 
 		<script>
-      //get the own userid
-			window.userId = 1;
 
 			// The function zusagen will load the acception/ rejection and the comment into the db
 			function zusagen(eventid, zusage) {
@@ -53,9 +51,8 @@
 					}
 				};
 				xhttp.open("POST", "/eventzusage/", true);
-        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhttp.send(JSON.stringify({
-					userid: window.userId,
+       		 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        		xhttp.send(JSON.stringify({
 					eventid: eventid,
 					kommentar: document.getElementById("textarea").value,
 					zusage: zusage,
@@ -100,7 +97,7 @@
 					}
 				};
 				// the "../" is required because we're in "static" folder!
-				xhttp.open("GET", "/offeneEvents/" + window.userId, true);
+				xhttp.open("GET", "/offeneEvents", true);
 				xhttp.send();
 			}
 

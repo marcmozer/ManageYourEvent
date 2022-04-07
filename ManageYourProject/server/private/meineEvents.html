@@ -54,8 +54,6 @@
 			}
 		}
 
-		window.userId = 1;
-
 		// get zugesagte Events
 		function loadDoc(){
 		var xhttp = new XMLHttpRequest();
@@ -89,7 +87,7 @@
 			}
 		};
 		// the "../" is required because we're in "static" folder!
-		xhttp.open("GET", "/zugesagteEvents/" + window.userId, true);
+		xhttp.open("GET", "/zugesagteEvents", true);
 		xhttp.send();
 		}
 
@@ -124,7 +122,7 @@
 				document.getElementById("selbstErstellteEventstable").innerHTML = txt;
 			}
 		};
-		xhttp.open("GET", "/selbstErstellteEvents/" + window.userId, true);
+		xhttp.open("GET", "/selbstErstellteEvents", true);
 		xhttp.send();
 	}
 	loadDoc();

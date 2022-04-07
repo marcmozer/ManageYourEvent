@@ -16,37 +16,11 @@ var dbInfo = {
 	database: process.env.MYSQL_DATABASE,
 };
 
-var dbInfo2 = {
-	connectionLimit: 10,
-	host: process.env.MYSQL_HOSTNAME2,
-	user: process.env.MYSQL_USER2,
-	password: process.env.MYSQL_PASSWORD2,
-	database: process.env.MYSQL_DATABASE2,
-};
 var connection = mysql.createPool(dbInfo);
 console.log("Conecting to database1");
-// connection.connect(); <- connect not required in connection pool
-
-var connection2 = mysql.createPool(dbInfo2);
-console.log("Connecting to database2");
-
 
 // Check the connection for connection
 connection.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
-	if (error) throw error; // <- this will throw the error and exit normally
-	// check the solution - should be 2
-	if (results[0].solution == 2) {
-		// everything is fine with the database
-		console.log("Database connected and works");
-	} else {
-		// connection is not fine - please check
-		console.error("There is something wrong with your database connection! Please check");
-		process.exit(5); // <- exit application with error code e.g. 5
-	}
-});
-
-// Check the connection for connection2
-connection2.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
 	if (error) throw error; // <- this will throw the error and exit normally
 	// check the solution - should be 2
 	if (results[0].solution == 2) {
@@ -78,9 +52,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //Features for Session
-
-
-// app.use(express.static(__dirname));
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
@@ -127,7 +98,7 @@ app.post("/login", (req, res) => {
 						//passwordsMatch
 						console.log("Passwörter stimmen überein");
 						// Authenticate the user
-						req.session.userid = email;
+						req.session.userid = result[0]["userid"];
 						console.log(req.session.userid);
 						//Redirect to uebersicht page
 						res.redirect("/private/uebersicht.html");
@@ -143,6 +114,7 @@ app.post("/login", (req, res) => {
 		res.end();
 	}
 });
+
 // checks for private pages if session is started and user logged in
 app.use("/private/*", (req, res, next) => {
 	console.log("bin in app.use");
@@ -150,8 +122,7 @@ app.use("/private/*", (req, res, next) => {
 	//add your code to run every time route is hit
 	if (req.session.userid) {
 		console.log("authenticate was true");
-		app.use(express.static('private/'));
-		
+		app.use(express.static("private/"));
 	} else {
 		//app.use(express.static('pubilc/login'));
 		res.redirect("/static/login.html");
@@ -254,7 +225,7 @@ app.post("/eventErstellen", (req, res) => {
 	}
 	res.end();
 	// it will be added to the database with a query.
-	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl && !req.body.userid) {
+	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl) {
 		// There is nobody with correct data
 		console.error("Client send no correct data!");
 		// Set HTTP Status -> 400 is client error -> and send message
@@ -269,7 +240,7 @@ app.post("/eventErstellen", (req, res) => {
 	var datum = req.body.datum;
 	var uhrzeit = req.body.uhrzeit;
 	var teilnehmerAnzahl = req.body.teilnehmerAnzahl;
-	var userid = req.body.userid;
+	var userid = req.session.userid;
 	connection.query(
 		"INSERT INTO event (`titel`, `beschreibung`, `adminid`, `geplantes_datum`, `geplante_uhrzeit`, `teilnehmer_anzahl`) VALUES ('" +
 			titel +
@@ -290,15 +261,17 @@ app.post("/eventErstellen", (req, res) => {
 				console.error(error); // <- log error in server
 				res.status(500).json(error); // <- send to client
 			}
-			console.log("Event mit der ID: " + result.insertId + " wurde erfolgreich von user " + userid + "erstellt.");
+			console.log("Event mit der ID: " + result.insertId + " wurde erfolgreich von user " + userid + " erstellt.");
 			zusagen(userid, result.insertId, "Eventersteller", 1, () => res.status(200).send());
 		}
 	);
 });
 // ###################### EventErstellen PART END ######################
 
+// ###################### Übersicht-Offene Events PART ######################
 //GET path for for open events where you can still participate
-app.get("/offeneEvents/:userId", (req, res) => {
+app.get("/offeneEvents", (req, res) => {
+	console.log(req.session);
 	connection.query(
 		"SELECT * FROM event WHERE event.teilnehmer_anzahl > (SELECT COUNT(*) FROM eventzusage WHERE eventzusage.eventid = event.eventid AND eventzusage.zusage = 1)",
 		(eventError, events) => {
@@ -307,7 +280,7 @@ app.get("/offeneEvents/:userId", (req, res) => {
 				console.error(eventError); // <- log error in server
 				res.status(500).json(eventError); // <- send to client
 			}
-			connection.query("SELECT * FROM eventzusage WHERE userid=" + req.params.userId, async (zusagenError, zusagen) => {
+			connection.query("SELECT * FROM eventzusage WHERE userid=" + req.session.userid, async (zusagenError, zusagen) => {
 				if (zusagenError) {
 					// we got an errror - inform the client
 					console.error(zusagenError); // <- log error in server
@@ -323,14 +296,16 @@ app.get("/offeneEvents/:userId", (req, res) => {
 						}
 					}
 				}
-				console.log("Events for user: " + req.params.userId + " has been successfully loaded and will be returned.");
+				console.log("Events for user: " + req.session.userid + " has been successfully loaded and will be returned.");
 				// Everything is fine with the query
 				res.status(200).json(events); // <- send it to client
 			});
 		}
 	);
 });
+// ###################### Übersicht-Offene Events PART END ######################
 
+// ###################### Übersicht-Event zusagen PART ######################
 //function assigns the correct id/user to the event acceptance
 function zusagen(userid, eventid, kommentar, zusage, callback) {
 	connection.query("INSERT INTO eventzusage (`userid`, `eventid`, `kommentar`, `zusage`) VALUES (" + userid + ", " + eventid + ", '" + kommentar + "', " + zusage + ")", (ezError, ezResult) => {
@@ -346,7 +321,7 @@ function zusagen(userid, eventid, kommentar, zusage, callback) {
 
 //POST path for an event acceptance
 app.post("/eventzusage/", (req, res) => {
-	if (!req.body && req.body.userid && req.body.eventid && req.body.kommentar && req.body.zusage) {
+	if (!req.body && req.body.eventid && req.body.kommentar && req.body.zusage) {
 		console.error("Client send no correct data!");
 		// Set HTTP Status -> 400 is client error -> and send message
 		res.status(400).json({
@@ -354,19 +329,21 @@ app.post("/eventzusage/", (req, res) => {
 		});
 	}
 	//use the function zusagen from above
-	zusagen(req.body.userid, req.body.eventid, req.body.kommentar, req.body.zusage, () => res.status(200).send());
+	zusagen(req.session.userid, req.body.eventid, req.body.kommentar, req.body.zusage, () => res.status(200).send());
 });
+// ###################### Übersicht-Event zusagen PART END ######################
 
+// ###################### MeineEvents PART ######################
 //GET path for accepted events
-app.get("/zugesagteEvents/:userId", (req, res) => {
-	connection.query("SELECT * FROM event join eventzusage on event.eventid = eventzusage.eventid where eventzusage.userid = " + req.params.userId, (eventError, events) => {
+app.get("/zugesagteEvents", (req, res) => {
+	connection.query("SELECT * FROM event join eventzusage on event.eventid = eventzusage.eventid where eventzusage.userid = " + req.session.userid, (eventError, events) => {
 		if (eventError) {
 			// we got an errror - inform the client
 			console.error(eventError); // <- log error in server
 			res.status(500).json(eventError); // <- send to client
 		}
 		for (let i = 0; i < events.length; i++) {
-			if (events[i].adminid == req.params.userId) {
+			if (events[i].adminid == req.session.userid) {
 				events.splice(i, 1); // delete events that you have created yourself, because here you are automatically a participant
 				i--;
 			}
@@ -378,8 +355,8 @@ app.get("/zugesagteEvents/:userId", (req, res) => {
 });
 
 //GET path for Events created by yourself
-app.get("/selbstErstellteEvents/:userId", (req, res) => {
-	connection.query("SELECT * FROM event where event.adminid = " + req.params.userId, (eventError, events) => {
+app.get("/selbstErstellteEvents", (req, res) => {
+	connection.query("SELECT * FROM event where event.adminid = " + req.session.userid, (eventError, events) => {
 		if (eventError) {
 			// we got an errror - inform the client
 			console.error(eventError); // <- log error in server
@@ -388,6 +365,7 @@ app.get("/selbstErstellteEvents/:userId", (req, res) => {
 		res.status(200).json(events); // <- send it to client    }
 	});
 });
+// ###################### MeineEvents PART END ######################
 
 // All requests to /static/... will be redirected to static files in the folder "public"
 // call it with: http://localhost:8080/static
@@ -402,8 +380,3 @@ app.use(session());
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
-
-// Start database connection
-const sleep = (milliseconds) => {
-	return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};
