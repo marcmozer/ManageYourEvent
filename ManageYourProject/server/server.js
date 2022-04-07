@@ -30,16 +30,6 @@ console.log("Conecting to database1");
 var connection2 = mysql.createPool(dbInfo2);
 console.log("Connecting to database2");
 
-// SQL Database init.
-// In this current demo, this is done by the "database.sql" file which is stored in the "db"-container (./db/).
-// Alternative you could use the mariadb basic sample and do the following steps here:
-/*
-connection.query("CREATE TABLE IF NOT EXISTS table1 (task_id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)  ENGINE=INNODB;", function (error, results, fields) {
-    if (error) throw error;
-    console.log('Answer: ', results);
-});
-*/
-// See readme.md for more information about that.
 
 // Check the connection for connection
 connection.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
@@ -89,7 +79,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //Features for Session
 
-// const path = require('path');
+
 // app.use(express.static(__dirname));
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
@@ -99,23 +89,7 @@ app.get("/", (req, res) => {
 	res.redirect("/static");
 });
 
-// Another GET Path that shows the actual Request (req) Headers - call it with: http://localhost:8080/request_info
-app.get("/request_info", (req, res) => {
-	console.log("Request content:", req);
-	res.send("This is all I got from the request:" + JSON.stringify(req.headers));
-});
-
-//checking function if session is running
-// const validateSession = (req,res,next) =>{
-// 	if(!req.session.userid){
-// 		res.redirect("/static/login.html");
-// 		console.log("Redirected zu Login")
-// 	}else{
-// 		next();
-// 	}
-// }
-
-//login
+//###################### Login PART ######################
 app.post("/login", (req, res) => {
 	console.log("You are on the login Page");
 	// it will be added to the database with a query.
@@ -169,8 +143,25 @@ app.post("/login", (req, res) => {
 		res.end();
 	}
 });
+// checks for private pages if session is started and user logged in
+app.use("/private/*", (req, res, next) => {
+	console.log("bin in app.use");
+	console.log(req.session.userid);
+	//add your code to run every time route is hit
+	if (req.session.userid) {
+		console.log("authenticate was true");
+		app.use(express.static('private/'));
+		
+	} else {
+		//app.use(express.static('pubilc/login'));
+		res.redirect("/static/login.html");
+		console.log("authenticate redirected to login");
+	}
+	next();
+});
+// ###################### Login PART END ######################
 
-// registration
+// ###################### Registration PART ######################
 app.post("/registrierung", (req, res) => {
 	// it will be added to the database with a query.
 	if (!req.body && !req.body.vname && !req.body.nname && !req.body.email && !req.body.passwort && !req.body.passwortWiederholen) {
@@ -239,30 +230,17 @@ app.post("/registrierung", (req, res) => {
 		}
 	});
 });
-// checks for private pages if session is started and user logged in
-app.use("/private/*", (req, res, next) => {
-	console.log("bin in app.use");
-	console.log(req.session.userid);
-	//add your code to run every time route is hit
-	if (req.session.userid) {
-		console.log("authenticate was true");
-		app.use(express.static('private/'));
-		
-	} else {
-		//app.use(express.static('pubilc/login'));
-		res.redirect("/static/login.html");
-		console.log("authenticate redirected to login");
-	}
-	next();
-});
+// ###################### Registration PART END ######################
 
-//logout
+// ###################### Logout PART ######################
 app.post("/abmelden", (req, res) => {
 	// end session and redirect to /static
 	req.session.destroy();
 	console.log("session got destroyed");
 	res.redirect("/static");
 });
+// ###################### Logout PART END ######################
+
 // ###################### EventErstellen PART ######################
 // POST path for database
 app.post("/eventErstellen", (req, res) => {
