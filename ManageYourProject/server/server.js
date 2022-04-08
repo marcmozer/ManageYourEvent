@@ -51,7 +51,6 @@ app.use(cors());
 // Features for JSON Body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//Features for Session
 
 // Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
 app.get("/", (req, res) => {
@@ -79,7 +78,6 @@ app.post("/login", (req, res) => {
 
 	// Ensure the input fields exists and are not empty
 	if (email && passwort) {
-		//TODO bcryp hash
 		connection.query("SELECT * FROM user WHERE email = '" + email + "'", (error, result) => {
 			if (error) {
 				// we got an errror - inform the client
@@ -90,6 +88,7 @@ app.post("/login", (req, res) => {
 			if (!result.length) {
 				res.send("Email oder Passwort sind falsch");
 			} else {
+				//compares input password with password in db
 				bcrypt.compare(passwort, result[0]["passwort"], (bErr, bResult) => {
 					if (bErr) {
 						throw bErr;
@@ -151,7 +150,7 @@ app.post("/registrierung", (req, res) => {
 	var passwort = req.body.passwort;
 	var passwortWiederholen = req.body.passwortWiederholen;
 
-	//TODO Antworten an Client senden
+	//sends answers to client
 	connection.query("SELECT * FROM user WHERE email = '" + email + "'", (error, result) => {
 		if (error) {
 			// we got an errror - inform the client
@@ -235,12 +234,6 @@ app.post("/eventErstellen", (req, res) => {
 	}
 	// The content looks good, so move on
 	// Get the content to local variables:
-	var titel = req.body.titel;
-	var beschreibung = req.body.beschreibung;
-	var datum = req.body.datum;
-	var uhrzeit = req.body.uhrzeit;
-	var teilnehmerAnzahl = req.body.teilnehmerAnzahl;
-	var userid = req.session.userid;
 	connection.query(
 		"INSERT INTO event (`titel`, `beschreibung`, `adminid`, `geplantes_datum`, `geplante_uhrzeit`, `teilnehmer_anzahl`) VALUES ('" +
 			titel +

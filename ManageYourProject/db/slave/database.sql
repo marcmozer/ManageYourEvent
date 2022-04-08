@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: host1
--- Erstellungszeit: 30. Mrz 2022 um 08:24
--- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal
+-- Erstellungszeit: 08. Apr 2022 um 08:56
+-- Server-Version: 10.7.3-MariaDB-1:10.7.3+maria~focal-log
 -- PHP-Version: 8.0.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -42,10 +42,13 @@ CREATE TABLE `event` (
 --
 
 INSERT INTO `event` (`eventid`, `titel`, `beschreibung`, `adminid`, `geplantes_datum`, `teilnehmer_anzahl`, `geplante_uhrzeit`) VALUES
-(1, 'Test-Event', 'Dieses Event soll zur Absprache unter allen Interessierten dienen.', 1, '2022-03-18', 0, '00:00:00'),
-(2, 'Versuch', 'mal sehen ob es klappt', 2, '2022-03-02', 12, '00:00:00'),
-(3, '12345346', 'cfewr', 1, '2222-02-23', 34, '03:02:00'),
-(4, 'Nachholtermin ', 'Aufgrund früherer Krankheit wird der Termin nun nachgeholt.', 2, '2022-03-02', 13, '18:30:40');
+(1, 'Geburtstag', 'Ich feiere meinen 20. Geburtstag im großen Rahmen.', 1, '2022-08-01', 50, '18:00:00'),
+(2, 'Spontanes Treffen', 'wer hat Lust sich spontan zu einem Grillabend zu treffen?', 2, '2022-05-05', 8, '00:00:00'),
+(3, 'Weiterbildung', 'Ich biete ein Seminar zum Thema \"Programmieren mit JS\" an', 1, '2022-06-02', 25, '18:00:00'),
+(4, 'Nachholtermin ', 'Aufgrund früherer Krankheit wird der Termin nun nachgeholt.', 2, '2022-03-02', 13, '18:30:40'),
+(5, 'Geschäftsessen', 'Wir treffen uns im Peter Pane in Stuttgart.', 3, '2022-05-27', 15, '17:00:00'),
+(6, 'Geschäftsausflug', 'Ich plane einen Ausflug mit meinen Kollegen ins Disneyland.', 2, '2022-05-21', 6, '10:00:00'),
+(7, 'Wanderausflug', 'Geplant ist eine Rundwanderung im Schwarzwald.', 3, '2022-06-14', 7, '11:00:00');
 
 -- --------------------------------------------------------
 
@@ -66,45 +69,16 @@ CREATE TABLE `eventzusage` (
 --
 
 INSERT INTO `eventzusage` (`ezid`, `userid`, `eventid`, `kommentar`, `zusage`) VALUES
-(1, 1, 1, 'Ich nehme gerne daran teil', 1),
+(1, 1, 1, 'Eventersteller', 1),
 (3, 1, 3, 'Eventersteller', 1),
-(4, 1, 2, 'wdsasdad', 1),
-(5, 2, 2, 'unter Vorbehalt', 1);
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `login`
---
-
-CREATE TABLE `login` (
-  `loginid` int(11) NOT NULL,
-  `userid` int(11) NOT NULL DEFAULT 0,
-  `password` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `table1`
---
-
-CREATE TABLE `table1` (
-  `task_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Daten für Tabelle `table1`
---
-
-INSERT INTO `table1` (`task_id`, `title`, `description`, `created_at`) VALUES
-(1, 'Super titel', 'langer text', '2020-04-09 12:18:07'),
-(2, 'Anderer Titel', 'Super Text', '2020-04-09 12:18:43'),
-(3, 'Anderer Titel2', 'noch mehr text', '2020-04-09 12:18:57'),
-(4, 'Title', 'Description', '2022-03-26 15:55:27');
+(4, 1, 2, 'ich freue mich drauf', 1),
+(5, 2, 2, 'unter Vorbehalt', 1),
+(6, 3, 7, 'Eventersteller', 1),
+(7, 3, 2, 'ich komme etwas später', 1),
+(8, 3, 5, 'Eventersteller', 1),
+(9, 2, 4, 'Eventersteller', 1),
+(10, 2, 2, 'Eventersteller', 1),
+(11, 2, 6, 'Eventersteller', 1);
 
 -- --------------------------------------------------------
 
@@ -126,8 +100,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`userid`, `vname`, `nname`, `email`, `reg_datum`, `passwort`) VALUES
-(1, 'testname', 'testnachname', 'testperson@test.de', '2022-03-16', ''),
-(2, 'ewad', 'qweqwe', 'test.@de', '2022-03-26', '$2b$10$2ENoIsV8vfx487q8eANsgOj9C0uKqia9iuaJNl4o06QfUMZdCjUwe');
+(1, 'marc', 'mozer', 'marc.mozer@mail.de', '2022-04-08', '$2b$10$eNl3Qmby6iXbtkC4ewop4.9sbTAAgK5Ntt70xfz.0VDEefxE9Vkb.'),
+(2, 'hannah', 'hirth', 'hannah.hirth@mail.de', '2022-04-08', '$2b$10$uP50kVPxJvL1J.Rz4IoKm.rkSuFE8r/Yq9IH8x/XHAxh.QuAOlNwa'),
+(3, 'joeline', 'dobler', 'joeline.dobler@mail.de', '2022-04-08', '$2b$10$1Jrh/kBOywhcWsN.zrzTzOEk/I/NCFZZL8ftixFka1/UbunKUT2ny');
 
 --
 -- Indizes der exportierten Tabellen
@@ -149,19 +124,6 @@ ALTER TABLE `eventzusage`
   ADD KEY `eventid` (`eventid`);
 
 --
--- Indizes für die Tabelle `login`
---
-ALTER TABLE `login`
-  ADD PRIMARY KEY (`loginid`),
-  ADD KEY `userid` (`userid`);
-
---
--- Indizes für die Tabelle `table1`
---
-ALTER TABLE `table1`
-  ADD PRIMARY KEY (`task_id`);
-
---
 -- Indizes für die Tabelle `user`
 --
 ALTER TABLE `user`
@@ -175,39 +137,24 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `eventid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT für Tabelle `eventzusage`
 --
 ALTER TABLE `eventzusage`
-  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT für Tabelle `login`
---
-ALTER TABLE `login`
-  MODIFY `loginid` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT für Tabelle `table1`
---
-ALTER TABLE `table1`
-  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ezid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-
 
 
 /*INSERT DATABASEDUMP ABOVE!!!!!!! */
