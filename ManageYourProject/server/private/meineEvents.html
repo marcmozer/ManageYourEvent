@@ -43,19 +43,8 @@
 
 </body>
 	<script>
-		//function to hide the other information if one of the buttons is clicked
-		function hideTable(tableName){
-			if(tableName=="zugesagte"){
-				document.getElementById("selbstErstellteEvents").style.display="none";
-				document.getElementById("zugesagteEvents").style.display = "";
-			}else if(tableName=="selbstErstellte"){
-				document.getElementById("zugesagteEvents").style.display = "none";
-				document.getElementById("selbstErstellteEvents").style.display = "";
-			}
-		}
-
 		// get zugesagte Events
-		function loadDoc(){
+		function loadZugesagte(){
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
@@ -92,7 +81,7 @@
 		}
 
 		// get selbst erstellte Events
-		function loadDoc(){
+		function loadSelbstErstellte(){
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
@@ -125,7 +114,23 @@
 		xhttp.open("GET", "/selbstErstellteEvents", true);
 		xhttp.send();
 	}
-	loadDoc();
+
+	//function to hide the other information if one of the buttons is clicked
+	function hideTable(tableName) {
+		if (tableName == "zugesagte") {
+			//reload data to make sure the newest data is shown
+			loadZugesagte();
+			document.getElementById("selbstErstellteEvents").style.display = "none";
+			document.getElementById("zugesagteEvents").style.display = "";
+		} else if (tableName == "selbstErstellte") {
+			//reload data to make sure the newest data is shown
+			loadSelbstErstellte();
+			document.getElementById("zugesagteEvents").style.display = "none";
+			document.getElementById("selbstErstellteEvents").style.display = "";
+		}
+	}
+	//load initial data 
+	loadZugesagte();
 	</script>
 </html>
 

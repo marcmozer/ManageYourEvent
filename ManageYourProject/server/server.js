@@ -307,7 +307,7 @@ function zusagen(userid, eventid, kommentar, zusage, callback) {
 			console.error(ezError); // <- log error in server
 			res.status(500).json(ezError); // <- send to client
 		}
-		console.log("Eventzusage mit der ID: " + ezResult.insertId + " wurde erfolgreich von user " + userid + "erstellt.");
+		console.log("Eventzusage mit der ID: " + ezResult.insertId + " wurde erfolgreich von user " + userid + " erstellt.");
 		callback();
 	});
 }
