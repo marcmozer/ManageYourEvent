@@ -224,7 +224,7 @@ app.post("/eventErstellen", (req, res) => {
 	}
 	res.end();
 	// it will be added to the database with a query.
-	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl) {
+	if (!req.body && !req.body.titel && !req.body.beschreibung && !req.body.uhrzeit && !req.body.datum && !req.body.teilnehmerAnzahl && !req.body.userid) {
 		// There is nobody with correct data
 		console.error("Client send no correct data!");
 		// Set HTTP Status -> 400 is client error -> and send message
@@ -234,6 +234,12 @@ app.post("/eventErstellen", (req, res) => {
 	}
 	// The content looks good, so move on
 	// Get the content to local variables:
+	var titel = req.body.titel;
+	var beschreibung = req.body.beschreibung;
+	var datum = req.body.datum;
+	var uhrzeit = req.body.uhrzeit;
+	var teilnehmerAnzahl = req.body.teilnehmerAnzahl;
+	var userid = req.body.userid;
 	connection.query(
 		"INSERT INTO event (`titel`, `beschreibung`, `adminid`, `geplantes_datum`, `geplante_uhrzeit`, `teilnehmer_anzahl`) VALUES ('" +
 			titel +
@@ -254,7 +260,7 @@ app.post("/eventErstellen", (req, res) => {
 				console.error(error); // <- log error in server
 				res.status(500).json(error); // <- send to client
 			}
-			console.log("Event mit der ID: " + result.insertId + " wurde erfolgreich von user " + userid + " erstellt.");
+			console.log("Event mit der ID: " + result.insertId + " wurde erfolgreich von user " + userid + "erstellt.");
 			zusagen(userid, result.insertId, "Eventersteller", 1, () => res.status(200).send());
 		}
 	);
